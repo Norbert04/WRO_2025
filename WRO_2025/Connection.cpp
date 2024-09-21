@@ -1,4 +1,4 @@
-#include "../SHARED/Connection.h"
+#include "Connection.h"
 
 Connection::Connection()
 {
