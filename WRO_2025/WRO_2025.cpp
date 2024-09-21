@@ -1,6 +1,4 @@
-﻿#include "WRO_2025.h"
-
-int main()
+﻿int main()
 {
 	return 0;
 }
