@@ -118,7 +118,7 @@ bool wro::Connection::valid() const
 
 char* wro::Connection::toSerial(float f) const
 {
-	char* result = new char[sizeof(float) + 1];
+	char* result = new char[sizeof(float)];
 	std::memcpy(result, &f, sizeof(float));
 	return result;
 }
