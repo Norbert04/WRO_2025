@@ -71,6 +71,7 @@ void wro::Connection::drive(float speed) const
 	char* temp = toSerial(speed);
 	for (BYTE i = 0; i < sizeof(float); i++)
 		serialPutchar(fileDescriptor, temp[i]);
+	delete[] temp;
 }
 
 void wro::Connection::steer(float angle) const
@@ -79,6 +80,7 @@ void wro::Connection::steer(float angle) const
 	char* temp = toSerial(angle);
 	for (BYTE i = 0; i < sizeof(float); i++)
 		serialPutchar(fileDescriptor, temp[i]);
+	delete[] temp;
 }
 
 BYTE wro::Connection::waitForNext() const
@@ -105,9 +107,8 @@ std::string wro::Connection::getMessage() const
 	std::string result;
 	const BYTE len = serialGetchar(fileDescriptor);
 	for (BYTE i = 0; i < len; i++)
-	{
 		result.push_back(serialGetchar(fileDescriptor));
-	}
+
 	return result;
 }
 
