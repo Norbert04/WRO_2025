@@ -16,7 +16,7 @@ wro::Connection::~Connection()
 
 void wro::Connection::sendMessage(const std::string message) const
 {
-	if (valid() && message.size() < 256) // string must not exceed 255 characters
+	if (message.size() < 256) // string must not exceed 255 characters
 	{
 		serialPutchar(fileDescriptor, connectionCode::message);
 		serialPutchar(fileDescriptor, message.size());
@@ -33,7 +33,7 @@ void wro::Connection::sendMessage(const std::string message) const
 
 void wro::Connection::sendDebug(const std::string information) const
 {
-	if (valid() && information.size() < 256) // string must not exceed 255 characters
+	if (information.size() < 256) // string must not exceed 255 characters
 	{
 		serialPutchar(fileDescriptor, connectionCode::debug);
 		serialPutchar(fileDescriptor, information.size());
@@ -50,7 +50,7 @@ void wro::Connection::sendDebug(const std::string information) const
 
 void wro::Connection::sendError(const std::string error) const
 {
-	if (valid() && error.size() < 256) // string must not exceed 255 characters
+	if (error.size() < 256) // string must not exceed 255 characters
 	{
 		serialPutchar(fileDescriptor, connectionCode::debug);
 		serialPutchar(fileDescriptor, error.size());
