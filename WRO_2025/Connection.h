@@ -1,8 +1,10 @@
 #pragma once
-#include <array>
+
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <wiringSerial.h>
+#include <cstring>
 
 typedef unsigned char BYTE;
 
@@ -32,15 +34,16 @@ namespace wro
 		Connection(const Connection& other) = delete; // rule of three
 		Connection& operator=(const Connection& other) = delete; // rule of three
 
-		void sendMessage(std::string message);
-		void sendDebug(std::string information);
-		void sendError(std::string error);
+		void sendMessage(std::string message) const;
+		void sendDebug(std::string information) const;
+		void sendError(std::string error) const;
+
 		void drive(float speed) const;
 		void steer(float angle) const;
 
 		std::string getMessage() const;
 
-		bool valid();
+		bool valid() const;
 
 	private:
 		int fileDescriptor;
