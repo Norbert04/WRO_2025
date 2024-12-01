@@ -8,10 +8,11 @@ typedef unsigned char BYTE;
 
 namespace wro
 {
-	namespace conectionCode
+	namespace connectionCode
 	{
 		enum connectionCodes : BYTE
 		{
+			connect,
 			error,
 			message,
 			debug,
@@ -34,6 +35,10 @@ namespace wro
 		void sendMessage(std::string message);
 		void sendDebug(std::string information);
 		void sendError(std::string error);
+		void drive(float speed) const;
+		void steer(float angle) const;
+
+		std::string getMessage() const;
 
 		bool valid();
 

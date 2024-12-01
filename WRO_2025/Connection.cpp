@@ -15,6 +15,8 @@ void wro::Connection::sendMessage(std::string message)
 {
 	if (valid())
 	{
+}
+}
 
 	}
 }
@@ -23,13 +25,22 @@ void wro::Connection::sendDebug(std::string information)
 {
 	if (valid())
 	{
+}
+}
 
+void wro::Connection::drive(float speed) const
+{
 	}
+
+void wro::Connection::steer(float angle) const
+{
 }
 
 void wro::Connection::sendError(std::string error)
 {
 	if (valid())
+}
+std::string wro::Connection::getMessage() const
 	{
 
 	}
