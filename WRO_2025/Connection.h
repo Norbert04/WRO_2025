@@ -1,10 +1,10 @@
 #pragma once
 
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <unistd.h>
 #include <wiringSerial.h>
-#include <cstring>
 
 typedef unsigned char BYTE;
 
