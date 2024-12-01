@@ -1,13 +1,14 @@
 #pragma once
 
-typedef unsigned char BYTE;
+#include "Connection.h"
 
 namespace wro
 {
-	namespace Movement
+	namespace movement
 	{
-		void drive(float speed);// -1 < speed < 1
-		void stop();
-		void steer(float angle);// angle of wheels in radians
+		void drive(const Connection& connection, float speed);// -1 < speed < 1
+		void stop(const Connection& connection);
+		void steer(const Connection& connection, float angle);// angle of wheels in radians
+		float getAngle(const Connection& connection);
 	}
 }
