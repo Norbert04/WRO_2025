@@ -41,12 +41,16 @@ namespace wro
 		void drive(float speed) const;
 		void steer(float angle) const;
 
+		BYTE waitForNext() const;
+
 		std::string getMessage() const;
 
 		bool valid() const;
 
 	private:
 		int fileDescriptor;
+
+		char* toSerial(float f) const;
 	};
 
 }
