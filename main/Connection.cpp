@@ -29,7 +29,11 @@ void wro::Connection::sendError(char* error) const
 
 char* wro::Connection::getMessage() const
 {
-	return new char*;
+	const BYTE len = std::static_cast<BYTE>(Serial.read());
+	char* result = new char[len];
+	for (BYTE i = 0; i < len; i++)
+		Serial.readBytes(result, len);
+	return result;
 }
 
 bool wro::Connection::valid() const
