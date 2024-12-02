@@ -40,8 +40,6 @@ namespace wro
 		bool valid() const;
 
 	private:
-		int fileDescriptor;
-
 		char* toSerial(float f) const;
 	};
 
