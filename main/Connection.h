@@ -33,8 +33,6 @@ namespace wro
 		void sendDebug(char* information) const;
 		void sendError(char* error) const;
 
-		BYTE waitForNext() const;
-
 		char* getMessage() const;
 
 		bool valid() const;

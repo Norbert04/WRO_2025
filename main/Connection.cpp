@@ -14,22 +14,17 @@ wro::Connection::~Connection()
 
 void wro::Connection::sendMessage(char* message) const
 {
-
+	Serial.write(message);
 }
 
 void wro::Connection::sendDebug(char* information) const
 {
-
+	Serial.write(information);
 }
 
 void wro::Connection::sendError(char* error) const
 {
-
-}
-
-BYTE wro::Connection::waitForNext() const
-{
-
+	Serial.write(error);
 }
 
 char* wro::Connection::getMessage() const
