@@ -7,9 +7,10 @@ namespace wro
 {
 	namespace movement
 	{
+		void init(); // should be called in setup function to set corect pin modes
 		void drive(float speed);// -1 < speed < 1
 		void stop();
-		void steer(float angle);// angle of wheels in radians
+		void steer(float angle, float speed = 0.5);// angle of wheels in radians, 0 < speed < 1
 		float getAngle();
 	}
 }
