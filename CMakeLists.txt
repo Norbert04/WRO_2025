@@ -9,4 +9,4 @@ endif()
 project ("WRO_2025")
 
 # Include sub-projects.
-add_subdirectory ("WRO_2025")
+add_subdirectory ("RPI")
