@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#define BUTTON_PIN 0  // GPIO pin (WiringPi pin number, not BCM)
+constexpr int BUTTON_PIN = 0; // GPIO pin (WiringPi pin number, not BCM)
 
 int main() {
     if (wiringPiSetup() == -1) {
