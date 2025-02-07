@@ -6,6 +6,10 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_compile_definitions(_DEBUG)
+ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+
 project ("WRO_2025")
 
 # Include sub-projects.
