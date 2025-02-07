@@ -1,4 +1,3 @@
-#include <unistd.h>  
 #include <wiringPi.h>
 
 #include <cstdlib>
@@ -20,16 +19,15 @@ int main() {
         while (digitalRead(BUTTON_PIN) == HIGH) {
             delay(100);  
         }
-
+#if defined(DEBUG) || defined(_DEBUG)
         std::cout << "Button pressed, starting main" << std::endl;
+#endif // defined(DEBUG) || defined(_DEBUG)
 
         // Path to the main program executable
 
         //TODO
         const char *mainProgramPath = "/path/for/main/program";
-        char *args[] = {"/path/for/main/program", nullptr};
-
-        execv(mainProgramPath, args);
+        system(mainProgramPath);
     }
     return 0;
 }
