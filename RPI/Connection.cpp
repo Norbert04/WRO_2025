@@ -1,5 +1,7 @@
 #include "Connection.h"
 
+wro::Connection* wro::Connection::connection{ nullptr };
+
 wro::Connection::Connection()
 {
 	if ((fileDescriptor = serialOpen("/dev/ttyUSB0", 115200)) < 0)
@@ -12,6 +14,19 @@ wro::Connection::Connection()
 wro::Connection::~Connection()
 {
 	serialClose(fileDescriptor);
+}
+
+wro::Connection* wro::Connection::Get()
+{
+	if (connection == nullptr)
+		connection = new Connection();
+	return connection;
+}
+
+void wro::Connection::End()
+{
+	delete connection;
+	connection = nullptr;
 }
 
 void wro::Connection::sendMessage(const std::string message) const
@@ -81,6 +96,11 @@ void wro::Connection::steer(BYTE angle) const
 	for (BYTE i = 0; i < sizeof(float); i++)
 		serialPutchar(fileDescriptor, temp[i]);
 	delete[] temp;
+}
+
+void wro::Connection::stopMovement() const
+{
+	serialPutchar(fileDescriptor, connectionCode::stopMovement);
 }
 
 BYTE wro::Connection::waitForNext() const

@@ -22,15 +22,16 @@ namespace wro
 			steer,
 			beep,
 			gyroscope,
-			charge
+			charge,
+			stopMovement
 		};
 	}
 
 	class Connection
 	{
 	public:
-		Connection();
-		~Connection();
+		static Connection* Get();
+		static void End();
 		Connection(const Connection& other) = delete; // rule of three
 		Connection& operator=(const Connection& other) = delete; // rule of three
 
@@ -40,6 +41,7 @@ namespace wro
 
 		void drive(float speed) const;
 		void steer(BYTE angle) const;
+		void stopMovement() const;
 
 		BYTE waitForNext() const;
 
@@ -48,6 +50,10 @@ namespace wro
 		bool valid() const;
 
 	private:
+		Connection();
+		~Connection();
+		static Connection* connection;
+
 		int fileDescriptor;
 
 		char* toSerial(float f) const;

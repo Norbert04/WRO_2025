@@ -3,13 +3,11 @@
 
 int main()
 {
-	wro::Connection con{};
-	std::cout << "";
-	con.sendMessage("Hello");
+	wro::Connection::Get()->sendMessage("Hello");
 
-	if (con.waitForNext() == wro::connectionCode::message)
+	if (wro::Connection::Get()->waitForNext() == wro::connectionCode::message)
 	{
-		std::cout << con.getMessage() << "\n";
+		std::cout << wro::Connection::Get()->getMessage() << "\n";
 	}
 
 	return 0;

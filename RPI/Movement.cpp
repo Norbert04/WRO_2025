@@ -1,21 +1,21 @@
 #include "Movement.h"
 
-void wro::movement::drive(const Connection& connection, float speed)
+void wro::movement::drive(float speed)
 {
-	connection.drive(speed);
+	wro::Connection::Get()->drive(speed);
 }
 
-void wro::movement::stop(const Connection& connection)
+void wro::movement::stop()
 {
-	drive(connection, 0);
+	wro::Connection::Get()->stopMovement();
 }
 
-void wro::movement::steer(const Connection& connection, BYTE angle)
+void wro::movement::steer(BYTE angle)
 {
-	connection.steer(angle);
+	wro::Connection::Get()->steer(angle);
 }
 
-float wro::movement::getAngle(const Connection& connection)
+float wro::movement::getAngle()
 {
 	return 0.0f;
 }

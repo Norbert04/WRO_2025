@@ -17,7 +17,8 @@ namespace wro
 			steer,
 			beep,
 			gyroscope,
-			charge
+			charge,
+			stopMovement
 		};
 	}
 
