@@ -39,7 +39,7 @@ namespace wro
 		void sendError(std::string error) const;
 
 		void drive(float speed) const;
-		void steer(float angle) const;
+		void steer(BYTE angle) const;
 
 		BYTE waitForNext() const;
 

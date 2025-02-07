@@ -2,34 +2,32 @@
 
 void wro::movement::init()
 {
-	pinMode(pDrvDirection, OUTPUT);
-	pinMode(pDSpeed, OUTPUT);
-	pinMode(pSteerDirection, OUTPUT);
-	pinMode(pSSpeed, OUTPUT);
+	pinMode(pDrvForward, OUTPUT);
+	pinMode(pDrvBackward, OUTPUT);
+	pinMode(pDrvSpeed, OUTPUT);
+	motorSteering.attach(pSteering);
+	motorSteering.write(90);
 }
 
 void wro::movement::drive(float speed)
 {
-	digitalWrite(pDrvDirection, speed < 0);
-	analogWrite(pDSpeed, abs(speed) * 255);
+	digitalWrite(pDrvForward, speed > 0);
+	digitalWrite(pDrvBackward, speed < 0);
+	analogWrite(pDrvSpeed, abs(speed) * 255);
 }
 
 void wro::movement::stop()
 {
-	analogWrite(pDSpeed, 0);
-	analogWrite(pSSpeed, 0);
-	digitalWrite(pSteerDirection, 0);
-	digitalWrite(pDrvDirection, 0);
+	drive(0);
+	motorSteering.write(90);
 }
 
-void wro::movement::steer(float angle, float speed)
+void wro::movement::steer(int angle)
 {
-	digitalWrite(pSteerDirection, speed < 0);
-	analogWrite(pSSpeed, abs(speed) * 255);
+	motorSteering.write(angle)
 }
 
-float wro::movement::getAngle()
+BYTE wro::movement::getAngle()
 {
-	return ((analogRead(pAngle) * operatingVoltage / analogueReadResolution) - 1.65) *
-		0.5 * PI / 1.65;
+	return motorSteering.read();
 }

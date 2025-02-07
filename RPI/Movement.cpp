@@ -10,7 +10,7 @@ void wro::movement::stop(const Connection& connection)
 	drive(connection, 0);
 }
 
-void wro::movement::steer(const Connection& connection, float angle)
+void wro::movement::steer(const Connection& connection, BYTE angle)
 {
 	connection.steer(angle);
 }

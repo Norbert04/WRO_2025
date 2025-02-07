@@ -1,6 +1,8 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
+#include <Servo.h>
+
 typedef unsigned char BYTE;
 typedef BYTE PIN;
 
@@ -13,16 +15,17 @@ namespace wro
 		void init(); // should be called in setup function to set correct pin modes
 		void drive(float speed); // -1 < speed < 1
 		void stop();
-		void steer(float angle, float speed = 0.5); // angle of wheels in radians, 0 < speed < 1
-		float getAngle();
+		void steer(int angle); // angle of wheels in degree, 90deg is normal
+		BYTE getAngle();
 
-		constexpr PIN pDrvDirection = 9;
-		constexpr PIN pSteerDirection = 13;
+		constexpr PIN pDrvForward = 12;
+		constexpr PIN pDrvBackward = 13;
 		constexpr PIN pDrvSpeed = 3;
-		constexpr PIN pSteerSpeed = 10;
-		constexpr PIN pAngle = 14;
+		constexpr PIN pSteering = 10;
 		constexpr BYTE analogueReadResolution = 1023;
 		constexpr float operatingVoltage = 5.0;
+		
+		Servo motorSteering;
 	}
 }
 #endif // !MOVEMENT_H

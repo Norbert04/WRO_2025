@@ -74,7 +74,7 @@ void wro::Connection::drive(float speed) const
 	delete[] temp;
 }
 
-void wro::Connection::steer(float angle) const
+void wro::Connection::steer(BYTE angle) const
 {
 	serialPutchar(fileDescriptor, connectionCode::steer);
 	char* temp = toSerial(angle);
