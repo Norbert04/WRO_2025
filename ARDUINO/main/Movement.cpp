@@ -2,18 +2,18 @@
 
 void wro::movement::init()
 {
-	pinMode(pDrvForward, OUTPUT);
-	pinMode(pDrvBackward, OUTPUT);
-	pinMode(pDrvSpeed, OUTPUT);
-	motorSteering.attach(pSteering);
+	pinMode(P_DRV_FORWARD, OUTPUT);
+	pinMode(P_DRV_BACKWARD, OUTPUT);
+	pinMode(P_DRV_SPEED, OUTPUT);
+	motorSteering.attach(P_STEERING);
 	motorSteering.write(90);
 }
 
 void wro::movement::drive(float speed)
 {
-	digitalWrite(pDrvForward, speed > 0);
-	digitalWrite(pDrvBackward, speed < 0);
-	analogWrite(pDrvSpeed, abs(speed) * 255);
+	digitalWrite(P_DRV_FORWARD, speed > 0);
+	digitalWrite(P_DRV_BACKWARD, speed < 0);
+	analogWrite(P_DRV_SPEED, abs(speed) * 255);
 }
 
 void wro::movement::stop()

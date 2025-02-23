@@ -18,12 +18,12 @@ namespace wro
 		void steer(int angle); // angle of wheels in degree, 90deg is normal
 		BYTE getAngle();
 
-		constexpr PIN pDrvForward = 12;
-		constexpr PIN pDrvBackward = 13;
-		constexpr PIN pDrvSpeed = 3;
-		constexpr PIN pSteering = 10;
-		constexpr BYTE analogueReadResolution = 1023;
-		constexpr float operatingVoltage = 5.0;
+		constexpr PIN P_DRV_FORWARD = 12;
+		constexpr PIN P_DRV_BACKWARD = 13;
+		constexpr PIN P_DRV_SPEED = 3;
+		constexpr PIN P_STEERING = 10;
+		constexpr BYTE ANALOGUE_READ_RESOLUTION = 1023;
+		constexpr float OPERATING_VOLTAGE = 5.0;
 		
 		Servo motorSteering;
 	}
