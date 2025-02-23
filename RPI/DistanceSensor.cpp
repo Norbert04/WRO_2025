@@ -33,13 +33,13 @@ std::array<double, 4> DistanceSensor::update()
 	return distances;
 }
 
-std::array<double, 4> DistanceSensor::getLastValues()
+std::array<double, 4> DistanceSensor::getLastValues() const
 {
 	return distances;
 }
 
 void DistanceSensor::measureDistance(
-	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
+	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance) const
 {
 	while (digitalRead(pin) == LOW &&
 		std::chrono::duration_cast<long, std::chrono::milliseconds>

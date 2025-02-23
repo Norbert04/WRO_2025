@@ -12,12 +12,12 @@ class DistanceSensor
 public:
 	DistanceSensor();
 	std::array<double, 4> update();
-	std::array<double, 4> getLastValues();
+	std::array<double, 4> getLastValues() const;
 
 	static constexpr double NO_DISTANCE = -1.0;
 
 private:
-	static void measureDistance(BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance);
+	static void measureDistance(BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance) const;
 
 	std::array<double, 4> distances = // in cm
 	{ NO_DISTANCE, NO_DISTANCE, NO_DISTANCE, NO_DISTANCE }; // 0-front, 1-left,...(counter clockwise)
