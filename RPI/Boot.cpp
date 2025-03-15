@@ -1,13 +1,15 @@
 #include <wiringPi.h>
 
+#include <fstream>
 #include <cstdlib>
 #include <iostream>
 
 constexpr int BUTTON_PIN = 27; // GPIO pin (WiringPi pin number, not BCM)
-const char* LED_PATH = "/sys/class/leds/led0/brightness"; 
+const char* LED_PATH = "/sys/class/leds/ACT/brightness"; 
 
 void setLED(bool state) {
-    std::ofstream ledFile(LED_PATH);
+    std::ofstream ledFile;
+    ledFile = std::ofstream("/sys/class/leds/ACT/brightness");
     if (ledFile) {
         ledFile << (state ? "1" : "0");
         ledFile.close();
@@ -31,7 +33,7 @@ int main() {
 			delay(100);
 		}
 #if defined(DEBUG) || defined(_DEBUG)
-setLED(true); // Turn LED on
+        setLED(true); // Turn LED on
 
 		std::cout << "Button pressed, starting main" << std::endl;
 #endif // defined(DEBUG) || defined(_DEBUG)
