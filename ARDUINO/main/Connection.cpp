@@ -1,5 +1,7 @@
 #include "Connection.h"
 
+static wro::Connection* wro::Connection::connection = nullptr;
+
 wro::Connection::Connection()
 	: eventHandlers()
 {
@@ -46,60 +48,62 @@ void wro::Connection::sendError(char* error) const
 
 void wro::Connection::setEventHandlers(EventHandlers handlers)
 {
+  handlers.connect = onConnect;
+  handlers.error = onError;
 	eventHandlers = handlers;
 }
 
 void wro::Connection::handleEvent()
 {
-	const BYTE type = std::static_cast<BYTE>(Serial.read());
+	const BYTE type = (BYTE)(Serial.read());
 	switch (type)
 	{
 	case connectionCode::connect:
 		eventHandlers.connect();
 		break;
 	case connectionCode::error:
-		BYTE len = 0;
+		{BYTE len = 0;
 		char* error = getMessage(len);
 		eventHandlers.error(error, len);
-		break;
+		break;}
 	case connectionCode::message:
-		BYTE len = 0;
+		{BYTE len = 0;
 		char* msg = getMessage(len);
 		eventHandlers.message(msg, len);
-		break;
+		break;}
 	case connectionCode::debug:
-		BYTE len = 0;
+		{BYTE len = 0;
 		char* msg = getMessage(len);
 		eventHandlers.debug(msg, len);
-		break;
+		break;}
 	case connectionCode::drive:
-		float speed = 0.0;
+		{float speed = 0.0;
 		BYTE* buffer = new BYTE[sizeof(float)];
-		if (Serial.available < sizeof(float))
+		if (Serial.available() < sizeof(float))
 		{
 			delay(5);
-			if (Serial.available < sizeof(float))
+			if (Serial.available() < sizeof(float))
 				sendMessage("Failed to receive serial data");
 		}
 		Serial.readBytes(buffer, sizeof(float));
 		memcpy(buffer, &speed, sizeof(float));
 		eventHandlers.drive(speed);
 		delete[] buffer;
-		break;
+		break;}
 	case connectionCode::steer:
-		int angle = 0;
+		{int angle = 0;
 		BYTE* buffer = new BYTE[sizeof(float)];
-		if (Serial.available < sizeof(int))
+		if (Serial.available() < sizeof(int))
 		{
 			delay(2);
-			if (Serial.available < sizeof(int))
+			if (Serial.available() < sizeof(int))
 				sendMessage("Failed to receive serial data");
 		}
 		Serial.readBytes(buffer, sizeof(int));
-		memcpy(buffer, &speed, sizeof(int));
+		memcpy(buffer, &angle, sizeof(int));
 		eventHandlers.steer(angle);
 		delete[] buffer;
-		break;
+		break;}
 	case connectionCode::stopMovement:
 		eventHandlers.stop();
 		break;
@@ -111,17 +115,17 @@ void wro::Connection::handleEvent()
 
 char* wro::Connection::getMessage(BYTE& len) const
 {
-	if (Serial.available == 0)
+	if (Serial.available ()== 0)
 	{
 		delay(2);
-		if (Serial.available == 0)
+		if (Serial.available() == 0)
 			sendMessage("Failed to receive serial data");
 	}
-	len = std::static_cast<BYTE>(Serial.read());
-	if (Serial.available < len && len <= 64)
+	len = (BYTE)Serial.read();
+	if (Serial.available() < len && len <= 64)
 	{
 		delay(5);
-		if (Serial.available < len)
+		if (Serial.available() < len)
 			sendMessage("Failed to receive serial data");
 	}
 	char* result = new char[len];

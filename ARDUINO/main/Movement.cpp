@@ -1,5 +1,11 @@
 #include "Movement.h"
 
+namespace wro {
+	namespace movement {
+		Servo motorSteering;
+	}
+}
+
 void wro::movement::init()
 {
 	pinMode(P_DRV_FORWARD, OUTPUT);
@@ -24,7 +30,7 @@ void wro::movement::stop()
 
 void wro::movement::steer(int angle)
 {
-	motorSteering.write(angle)
+	motorSteering.write(angle);
 }
 
 BYTE wro::movement::getAngle()

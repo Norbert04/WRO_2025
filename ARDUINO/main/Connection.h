@@ -2,22 +2,12 @@
 #define CONNECTION_H
 
 #include "Arduino.h"
+#include "eventHandlers.h"
 
 typedef unsigned char BYTE;
 
 namespace wro
 {
-	struct EventHandlers
-	{
-		void (*connect)() = wro::Connection::onConnect;
-		void (*error)(char* error, BYTE length)  = wro::Connection::onError;
-		void (*message)(char* message, BYTE length) = wro::Connection::onMessage;
-		void (*debug)(char* message, BYTE length) = wro::Connection::onDebug;
-		void (*drive)(float speed) = [](float) {};
-		void (*steer)(int angle) = [](float) {};
-		void (*stop)() = []() {};
-	};
-
 	namespace connectionCode
 	{
 		enum connectionCodes : BYTE
@@ -31,6 +21,7 @@ namespace wro
 			stopMovement
 		};
 	}
+struct eventHandlers;
 
 	class Connection
 	{
@@ -49,7 +40,7 @@ namespace wro
 
 		void handleEvent();
 
-		char* getMessage() const;
+		char* getMessage(BYTE& len) const;
 
 		bool valid() const;
 
@@ -59,7 +50,7 @@ namespace wro
 
 		static Connection* connection;
 
-		EventHandlers eventHandlers;
+		wro::EventHandlers eventHandlers;
 
 		static void onConnect();
 		static void onError(char* error, BYTE length);
