@@ -5,10 +5,8 @@ int main()
 {
 	wro::Connection::Get()->sendMessage("Hello");
 
-	if (wro::Connection::Get()->waitForNext() == wro::connectionCode::message)
-	{
-		std::cout << wro::Connection::Get()->getMessage() << "\n";
-	}
+	wro::movement::drive(1);
+	wro::movement::steer(20);
 
 	return 0;
 }

@@ -5,18 +5,6 @@
 #include <iostream>
 
 constexpr int BUTTON_PIN = 27; // GPIO pin (WiringPi pin number, not BCM)
-const char* LED_PATH = "/sys/class/leds/ACT/brightness"; 
-
-void setLED(bool state) {
-    std::ofstream ledFile;
-    ledFile = std::ofstream("/sys/class/leds/ACT/brightness");
-    if (ledFile) {
-        ledFile << (state ? "1" : "0");
-        ledFile.close();
-    } else {
-        std::cerr << "Failed to access " << LED_PATH << std::endl;
-    }
-}
 
 int main() {
 	if (wiringPiSetup() == -1) {
@@ -32,8 +20,8 @@ int main() {
 		while (digitalRead(BUTTON_PIN) == HIGH) {
 			delay(100);
 		}
+		std::cout << "Button pressed, starting main" << std::endl;
 #if defined(DEBUG) || defined(_DEBUG)
-        setLED(true); // Turn LED on
 
 		std::cout << "Button pressed, starting main" << std::endl;
 #endif // defined(DEBUG) || defined(_DEBUG)

@@ -1,6 +1,8 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
+#include "Arduino.h"
+
 #include <Servo.h>
 
 typedef unsigned char BYTE;
