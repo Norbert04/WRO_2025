@@ -3,7 +3,15 @@
 static wro::Connection* wro::Connection::connection = nullptr;
 
 wro::Connection::Connection()
+	: eventHandlers()
 {
+	eventHandlers.connect = onConnect;
+	eventHandlers.error = onError;
+	eventHandlers.message = onMessage;
+	eventHandlers.debug = onDebug;
+	eventHandlers.drive = [](float) {};
+	eventHandlers.steer = [](int) {};
+	eventHandlers.stop = []() {};
 	Serial.begin(115200);
 	while (!valid())
 		continue;
@@ -45,9 +53,112 @@ void wro::Connection::sendError(char* error) const
 	Serial.write(error);
 }
 
-char* wro::Connection::getMessage() const
+void wro::Connection::setEventHandlers(EventHandlers handlers)
 {
-	const BYTE len = std::static_cast<BYTE>(Serial.read());
+	if (handlers.connect)
+		eventHandlers.connect = handlers.connect;
+	if (handlers.error)
+		eventHandlers.error = handlers.error;
+	if (handlers.message)
+		eventHandlers.message = handlers.message;
+	if (handlers.debug)
+		eventHandlers.debug = handlers.debug;
+	if (handlers.drive)
+		eventHandlers.drive = handlers.drive;
+	if (handlers.steer)
+		eventHandlers.steer = handlers.steer;
+	if (handlers.stop)
+		eventHandlers.stop = handlers.stop;
+}
+
+void wro::Connection::handleEvent()
+{
+	while (Serial.available() > 0)
+	{
+		const BYTE type = (BYTE)(Serial.read());
+		switch (type)
+		{
+		case connectionCode::connect:
+			eventHandlers.connect();
+			break;
+		case connectionCode::error:
+		{
+			BYTE len = 0;
+			char* error = getMessage(len);
+			eventHandlers.error(error, len);
+			break;
+		}
+		case connectionCode::message:
+		{
+			BYTE len = 0;
+			char* msg = getMessage(len);
+			eventHandlers.message(msg, len);
+			break;
+		}
+		case connectionCode::debug:
+		{
+			BYTE len = 0;
+			char* msg = getMessage(len);
+			eventHandlers.debug(msg, len);
+			break;
+		}
+		case connectionCode::drive:
+		{
+			float speed = 0.0;
+			BYTE* buffer = new BYTE[sizeof(float)];
+			if (Serial.available() < sizeof(float))
+			{
+				delay(5);
+				if (Serial.available() < sizeof(float))
+					sendMessage("Failed to receive serial data");
+			}
+			Serial.readBytes(buffer, sizeof(float));
+			memcpy(buffer, &speed, sizeof(float));
+			eventHandlers.drive(speed);
+			delete[] buffer;
+			break;
+		}
+		case connectionCode::steer:
+		{
+			int angle = 0;
+			BYTE* buffer = new BYTE[sizeof(float)];
+			if (Serial.available() < sizeof(int))
+			{
+				delay(2);
+				if (Serial.available() < sizeof(int))
+					sendMessage("Failed to receive serial data");
+			}
+			Serial.readBytes(buffer, sizeof(int));
+			memcpy(buffer, &angle, sizeof(int));
+			eventHandlers.steer(angle);
+			delete[] buffer;
+			break;
+		}
+		case connectionCode::stopMovement:
+			eventHandlers.stop();
+			break;
+		default:
+			sendMessage("Failed to decode serial data");
+			break;
+		}
+	}
+}
+
+char* wro::Connection::getMessage(BYTE& len) const
+{
+	if (Serial.available() == 0)
+	{
+		delay(2);
+		if (Serial.available() == 0)
+			sendMessage("Failed to receive serial data");
+	}
+	len = (BYTE)(Serial.read());
+	if (Serial.available() < len && len <= 64)
+	{
+		delay(5);
+		if (Serial.available() < len)
+			sendMessage("Failed to receive serial data");
+	}
 	char* result = new char[len];
 	for (BYTE i = 0; i < len; i++)
 		Serial.readBytes(result, len);
@@ -59,6 +170,20 @@ bool wro::Connection::valid() const
 	return Serial;
 }
 
-char* wro::Connection::toSerial(float f) const
+void wro::Connection::onConnect()
+{
+	Serial.write(connectionCode::connect);
+}
+
+void wro::Connection::onError(char* error, BYTE length)
+{
+	End();
+}
+
+void wro::Connection::onDebug(char* message, BYTE length)
+{
+}
+
+void wro::Connection::onMessage(char* message, BYTE length)
 {
 }
