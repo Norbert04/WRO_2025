@@ -38,7 +38,7 @@ void wro::Connection::sendMessage(const std::string message) const
 		serialPuts(fileDescriptor, message.c_str());
 #if defined(DEBUG) || defined(_DEBUG)
 		std::cout << "sent message " << message << "\n";
-#endif // DEBUG
+#endif // defined(DEBUG) || defined(_DEBUG)
 	}
 #if defined(DEBUG) || defined(_DEBUG)
 	else
@@ -55,7 +55,7 @@ void wro::Connection::sendDebug(const std::string information) const
 		serialPuts(fileDescriptor, information.c_str());
 #if defined(DEBUG) || defined(_DEBUG)
 		std::cout << "sent debug info " << information << "\n";
-#endif // DEBUG
+#endif // defined(DEBUG) || defined(_DEBUG)
 	}
 #if defined(DEBUG) || defined(_DEBUG)
 	else
@@ -72,7 +72,7 @@ void wro::Connection::sendError(const std::string error) const
 		serialPuts(fileDescriptor, error.c_str());
 #if defined(DEBUG) || defined(_DEBUG)
 		std::cout << "sent error info " << error << "\n";
-#endif // DEBUG
+#endif // defined(DEBUG) || defined(_DEBUG)
 	}
 #if defined(DEBUG) || defined(_DEBUG)
 	else

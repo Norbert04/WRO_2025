@@ -20,9 +20,6 @@ namespace wro
 			debug,
 			drive,
 			steer,
-			beep,
-			gyroscope,
-			charge,
 			stopMovement
 		};
 	}
