@@ -1,6 +1,6 @@
 #include "DistaceSensor.h"
 
-DistanceSensor::DistanceSensor()
+wro::DistanceSensor::DistanceSensor()
 {
 	pinMode(P_TRIGGER, OUTPUT);
 	pinMode(P_FRONT, INPUT);
@@ -13,7 +13,7 @@ DistanceSensor::DistanceSensor()
 	pullUpDnControl(P_RIGHT, PUD_DOWN);
 }
 
-std::array<double, 4> DistanceSensor::update()
+std::array<double, 4> wro::DistanceSensor::update()
 {
 	std::chrono::high_resolution_clock::time_point tTrigger =
 		std::chrono::high_resolution_clock::now();
@@ -33,16 +33,15 @@ std::array<double, 4> DistanceSensor::update()
 	return distances;
 }
 
-std::array<double, 4> DistanceSensor::getLastValues() const
+std::array<double, 4> wro::DistanceSensor::getLastValues() const
 {
 	return distances;
 }
 
-void DistanceSensor::measureDistance(
-	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance) const
+void wro::DistanceSensor::measureDistance(
+	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
 {
 	while (digitalRead(pin) == LOW &&
-		std::chrono::duration_cast<long, std::chrono::milliseconds>
 		(std::chrono::high_resolution_clock::now() - tTrigger) < std::chrono::milliseconds(15))
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
 
