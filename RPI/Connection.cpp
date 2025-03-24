@@ -8,7 +8,22 @@ wro::Connection::Connection()
 		std::cerr << "unable to open serial\n";
 	std::this_thread::sleep_for(std::chrono::milliseconds(500)); // wait for motor controller to finish setting up serial connection
 	serialPutchar(fileDescriptor, connectionCode::connect);
-	// TODO wait for response, if not responding try again or warn user
+	std::optional<BYTE> result = waitForNext(5);
+	if (!result)
+	{
+#if defined(DEBUG) || defined(_DEBUG)
+		std::cout << "waiting 5 more milliseconds for resonse\n";
+#endif // defined(DEBUG) || defined(_DEBUG)
+		result = waitForNext(5);
+	}
+	if (result && *result == connectionCode::connect)
+	{
+#if defined(DEBUG) || defined(_DEBUG)
+		std::cout << "creating connection succeeded\n";
+#endif // defined(DEBUG) || defined(_DEBUG)
+	}
+	else
+		std::cerr << "creating connection failed\n";
 }
 
 wro::Connection::~Connection()
@@ -110,7 +125,27 @@ BYTE wro::Connection::waitForNext() const
 #endif // defined(DEBUG) || defined(_DEBUG)
 
 	while (serialDataAvail(fileDescriptor) <= 0)
-		continue;
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+#if defined(DEBUG) || defined(_DEBUG)
+	std::cout << "received some serial data\n";
+#endif // defined(DEBUG) || defined(_DEBUG)
+
+	return serialGetchar(fileDescriptor);
+}
+
+std::optional<BYTE> wro::Connection::waitForNext(unsigned int ms) const
+{
+#if defined(DEBUG) || defined(_DEBUG)
+	std::cout << "waiting for response\n";
+#endif // defined(DEBUG) || defined(_DEBUG)
+	unsigned int t = 0;
+	while (serialDataAvail(fileDescriptor) <= 0)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		t += 5;
+		if (t >= ms)
+			return std::nullopt;
+	}
 #if defined(DEBUG) || defined(_DEBUG)
 	std::cout << "received some serial data\n";
 #endif // defined(DEBUG) || defined(_DEBUG)

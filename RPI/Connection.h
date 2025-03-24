@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstring>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <thread>
 #include <wiringSerial.h>
@@ -42,6 +43,7 @@ namespace wro
 		void stopMovement() const;
 
 		BYTE waitForNext() const;
+		std::optional<BYTE> waitForNext(unsigned int ms) const;
 
 		std::string getMessage() const;
 
