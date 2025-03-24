@@ -1,9 +1,10 @@
 #pragma once
 
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <unistd.h>
+#include <thread>
 #include <wiringSerial.h>
 
 typedef unsigned char BYTE;
@@ -37,7 +38,7 @@ namespace wro
 		void sendError(std::string error) const;
 
 		void drive(float speed) const;
-		void steer(BYTE angle) const;
+		void steer(short angle) const;
 		void stopMovement() const;
 
 		BYTE waitForNext() const;
@@ -55,5 +56,4 @@ namespace wro
 
 		char* toSerial(float f) const;
 	};
-
 }

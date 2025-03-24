@@ -6,7 +6,7 @@ wro::Connection::Connection()
 {
 	if ((fileDescriptor = serialOpen("/dev/ttyUSB0", 115200)) < 0)
 		std::cerr << "unable to open serial\n";
-	sleep(5); // wait for motor controller to finish setting up serial connection
+	std::this_thread::sleep_for(std::chrono::milliseconds(500)); // wait for motor controller to finish setting up serial connection
 	serialPutchar(fileDescriptor, connectionCode::connect);
 	// TODO wait for response, if not responding try again or warn user
 }
@@ -89,11 +89,11 @@ void wro::Connection::drive(float speed) const
 	delete[] temp;
 }
 
-void wro::Connection::steer(BYTE angle) const
+void wro::Connection::steer(short angle) const
 {
 	serialPutchar(fileDescriptor, connectionCode::steer);
 	char* temp = toSerial(angle);
-	for (BYTE i = 0; i < sizeof(float); i++)
+	for (BYTE i = 0; i < sizeof(short); i++)
 		serialPutchar(fileDescriptor, temp[i]);
 	delete[] temp;
 }
