@@ -54,6 +54,7 @@ namespace wro
 
 		int fileDescriptor;
 
-		char* toSerial(float f) const;
+		template<typename T>
+		char* toSerial(T i) const;
 	};
 }

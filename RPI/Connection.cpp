@@ -137,9 +137,10 @@ bool wro::Connection::valid() const
 	return fileDescriptor >= 0;
 }
 
-char* wro::Connection::toSerial(float f) const
+template<typename T>
+char* wro::Connection::toSerial(T i) const
 {
-	char* result = new char[sizeof(float)];
-	std::memcpy(result, &f, sizeof(float));
+	char* result = new char[sizeof(T)];
+	std::memcpy(result, &i, sizeof(T));
 	return result;
 }
