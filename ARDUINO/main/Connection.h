@@ -1,6 +1,8 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include "Arduino.h"
+
 typedef unsigned char BYTE;
 
 namespace wro
@@ -15,9 +17,6 @@ namespace wro
 			debug,
 			drive,
 			steer,
-			beep,
-			gyroscope,
-			charge,
 			stopMovement
 		};
 	}
@@ -25,8 +24,9 @@ namespace wro
 	class Connection
 	{
 	public:
-		Connection();
-		~Connection();
+		static Connection* Get();
+		static void End();
+
 		Connection(const Connection& other) = delete; // rule of three
 		Connection& operator=(const Connection& other) = delete; // rule of three
 
@@ -39,9 +39,11 @@ namespace wro
 		bool valid() const;
 
 	private:
-		char* toSerial(float f) const;
-	};
+		Connection();
+		~Connection();
 
+		static Connection* connection;
+	};
 }
 
 #endif // !CONNECTION_H
