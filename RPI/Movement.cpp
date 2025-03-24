@@ -10,7 +10,7 @@ void wro::movement::stop()
 	wro::Connection::Get()->stopMovement();
 }
 
-void wro::movement::steer(BYTE angle)
+void wro::movement::steer(short angle)
 {
 	wro::Connection::Get()->steer(angle);
 }
