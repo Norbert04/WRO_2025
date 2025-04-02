@@ -13,11 +13,8 @@ void setup()
 }
 
 void loop()
-{
-    
-}
-
-void serialEvent()
-{
-    wro::Connection::Get()->handleEvent();
+{ 
+      if(Serial.available() != 0) {
+        wro::Connection::Get()->handleEvent();
+      }
 }
