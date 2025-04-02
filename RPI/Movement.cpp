@@ -14,8 +14,3 @@ void wro::movement::steer(short angle)
 {
 	wro::Connection::Get()->steer(angle);
 }
-
-float wro::movement::getAngle()
-{
-	return 0.0f;
-}
