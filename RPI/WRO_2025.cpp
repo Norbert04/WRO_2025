@@ -1,14 +1,11 @@
-﻿#include "Movement.h"
-#include "Connection.h"
+﻿#include "Connection.h"
+#include "Movement.h"
 
 int main()
 {
-	wro::Connection::Get()->sendMessage("Hello");
-
-	if (wro::Connection::Get()->waitForNext() == wro::connectionCode::message)
-	{
-		std::cout << wro::Connection::Get()->getMessage() << "\n";
-	}
+	wro::movement::drive(1);
+	wro::movement::steer(20);
+	wro::movement::stop();
 
 	return 0;
 }
