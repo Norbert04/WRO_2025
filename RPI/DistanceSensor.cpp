@@ -1,5 +1,8 @@
 #include "DistaceSensor.h"
 
+#include <thread>
+#include <wiringPi.h>
+
 wro::DistanceSensor::DistanceSensor()
 {
 	pinMode(P_TRIGGER, OUTPUT);

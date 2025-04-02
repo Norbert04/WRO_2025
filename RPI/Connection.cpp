@@ -1,5 +1,11 @@
 #include "Connection.h"
 
+#include <chrono>
+#include <cstring>
+#include <iostream>
+#include <thread>
+#include <wiringSerial.h>
+
 wro::Connection* wro::Connection::connection{ nullptr };
 
 wro::Connection::Connection()
