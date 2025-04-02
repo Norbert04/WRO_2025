@@ -1,5 +1,5 @@
 ﻿# Add source to this project's executable.
-add_executable (WRO_2025 "WRO_2025.cpp" "Connection.cpp" "Movement.cpp" "DistanceSensor.cpp" "Camera.cpp" "Movement.h" "Connection.h" "DistaceSensor.h" "Camera.h")
+add_executable (WRO_2025 "WRO_2025.cpp" "Connection.cpp" "Movement.cpp" "DistanceSensor.cpp" "Camera.cpp" "Movement.h" "Connection.h" "DistaceSensor.h" "Camera.h" "Robot.h")
 
 find_library(WIRINGPI_LIBRARIES NAMES wiringPi)
 find_library(LIBCAMERA_LIBRARIES NAMES libcamera)

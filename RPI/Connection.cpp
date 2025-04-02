@@ -5,14 +5,15 @@ wro::Connection* wro::Connection::connection{ nullptr };
 wro::Connection::Connection()
 {
 	if ((fileDescriptor = serialOpen("/dev/ttyUSB0", 115200)) < 0)
-		std::cerr << "unable to open serial\n";
-	std::this_thread::sleep_for(std::chrono::milliseconds(500)); // wait for motor controller to finish setting up serial connection
+		if ((fileDescriptor = serialOpen("/dev/ttyUSB1", 115200)) < 0)
+			std::cerr << "unable to open serial\n";
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000)); // wait for motor controller to finish setting up serial connection
 	serialPutchar(fileDescriptor, connectionCode::connect);
-	std::optional<BYTE> result = waitForNext(5);
+	std::optional<BYTE> result = waitForNext(10);
 	if (!result)
 	{
 #if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "waiting 5 more milliseconds for resonse\n";
+		std::cout << "waiting 5 more milliseconds for response\n";
 #endif // defined(DEBUG) || defined(_DEBUG)
 		result = waitForNext(5);
 	}

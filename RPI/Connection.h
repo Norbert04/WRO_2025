@@ -8,7 +8,7 @@
 #include <thread>
 #include <wiringSerial.h>
 
-typedef unsigned char BYTE;
+#include "Robot.h"
 
 namespace wro
 {

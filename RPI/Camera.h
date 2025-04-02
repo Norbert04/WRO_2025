@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <libcamera/libcamera.h>
+#include "Robot.h"
 
 namespace wro
 {
