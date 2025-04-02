@@ -1,11 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <vector>
-
-#include <libcamera/libcamera.h>
-#include "Robot.h"
+#include <opencv2/opencv.hpp>
 
 namespace wro
 {
@@ -14,7 +9,9 @@ namespace wro
 	public:
 		Camera();
 		~Camera();
+		bool getImage(cv::Mat& image);
 
 	private:
+		cv::VideoCapture camera{};
 	};
 }
