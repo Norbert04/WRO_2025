@@ -5,7 +5,7 @@
 
 void setup()
 {
-    wro::EventHandlers handlers;
+    wro::EventHandlers handlers{ NULL };
     handlers.drive = wro::movement::drive;
     handlers.steer = wro::movement::steer;
     handlers.stop = wro::movement::stop;
