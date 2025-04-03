@@ -89,6 +89,7 @@ void wro::Connection::handleEvent()
 		{
 			BYTE len = 0;
 			char* msg = getMessage(len);
+			//TODO fix debug 
 			//eventHandlers.debug(msg, len);
 			break;
 		}
@@ -96,7 +97,7 @@ void wro::Connection::handleEvent()
 		case connectionCode::drive:
 		{
 			float speed = 0.0;
-			uint8_t buffer[sizeof(float)];  // No need for dynamic allocation
+			uint8_t buffer[sizeof(float)];  
 
 			// Wait until enough bytes are available
 			while (Serial.available() < sizeof(float));
@@ -113,7 +114,6 @@ void wro::Connection::handleEvent()
 		
 		case connectionCode::steer:
 		{
-
 			int angle = 0;
 			uint8_t buffer[sizeof(int)];
 
@@ -138,32 +138,28 @@ void wro::Connection::handleEvent()
 	}
 }
 
-char* wro::Connection::getMessage(BYTE& len) const
+char* wro::Connection::getMessage(BYTE& length) const
 {
-    // Wait until at least 1 byte is available (the length byte)
+    // Wait until at least 1 byte is available 
     while (Serial.available() == 0);
 
-    // Read message length
-    len = (BYTE)(Serial.read());
+    length = (BYTE)(Serial.read());
 
-    // Validate length (prevent buffer overflow)
-    if (len == 0 || len > 64) {
+    if (length == 0 || length > 64) {
         sendMessage("Invalid message length received");
-        len = 0;
+        length = 0;
         return nullptr;
     }
 
     // Wait until all bytes are available
-    while (Serial.available() < len);
+    while (Serial.available() < length);
 
-    // Allocate memory for the message
-    char* result = new char[len + 1];  // +1 for null-termination (optional)
+    char* result = new char[length + 1]; 
 
     // Read the message into the buffer
-    Serial.readBytes(result, len);
+    Serial.readBytes(result, length);
 
-    // Optional: Null-terminate the string for safety
-    result[len] = '\0';
+    result[length] = '\0';
 
     return result;
 }
