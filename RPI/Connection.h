@@ -1,14 +1,9 @@
 #pragma once
 
-#include <chrono>
-#include <cstring>
-#include <iostream>
 #include <optional>
 #include <string>
-#include <thread>
-#include <wiringSerial.h>
 
-typedef unsigned char BYTE;
+#include "Robot.h"
 
 namespace wro
 {
@@ -31,8 +26,8 @@ namespace wro
 	public:
 		static Connection* Get();
 		static void End();
-		Connection(const Connection& other) = delete; // rule of three
-		Connection& operator=(const Connection& other) = delete; // rule of three
+		Connection(const Connection& other) = delete;
+		Connection& operator=(const Connection& other) = delete;
 
 		void sendMessage(std::string message) const;
 		void sendDebug(std::string information) const;

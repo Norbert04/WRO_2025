@@ -1,9 +1,6 @@
 #pragma once
 
-#include <libcamera/libcamera.h>
-#include <memory>
-#include <vector>
-#include <iostream>
+#include <opencv2/opencv.hpp>
 
 namespace wro
 {
@@ -12,12 +9,9 @@ namespace wro
 	public:
 		Camera();
 		~Camera();
+		bool getImage(cv::Mat& image);
 
 	private:
-		std::shared_ptr<libcamera::Camera> camera;
-		libcamera::CameraManager manager;
-		libcamera::CameraConfiguration config;
-		FrameBufferAllocator* allocator;
-		libcamera::StreamConfiguration& streamConfig;
+		cv::VideoCapture camera{};
 	};
 }

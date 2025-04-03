@@ -8,7 +8,6 @@ namespace wro
 	{
 		void drive(float speed);// -1 < speed < 1
 		void stop();
-		void steer(int angle);// angle of wheels in degree
-		float getAngle();
+		void steer(short angle);// angle of wheels in degree
 	}
 }

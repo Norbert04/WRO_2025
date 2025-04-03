@@ -1,30 +1,21 @@
 #include "Camera.h"
 
+#include <iostream>
+
 wro::Camera::Camera()
-	: manager()
 {
-	manager->start();
-	std::vector<std::shared_ptr<libcamera::Camera>> cameras;
-	if (cameras.empty())
+	if (!camera.open(0))
 	{
-		std::cerr << "No camera could be detected\n";
+		std::cerr << "Failed to open camera device\n";
+		return;
 	}
-	camera = manager->get(cameras[0]->id());
-	camera->acquire();
-	config = camera->generateConfiguration({ libcamera::StreamRole::Raw });
-	allocator = new libcamera::FrameBufferAllocator(camera);
-	int res = allocator->allocate(config);
-	if (res < 0)
-	{
-		std::cerr << "buffer allocation failed\n";
-	}
-	streamConfig = config.at(0);
-	config->validate();
-	camera->configure(config.get());
 }
 
 wro::Camera::~Camera()
 {
-	camera->release();
-	camManager->stop();
+}
+
+bool wro::Camera::getImage(cv::Mat& image)
+{
+	return camera.read(image);
 }

@@ -1,4 +1,7 @@
-#include "DistanceSensor.h"
+#include "DistaceSensor.h"
+
+#include <thread>
+#include <wiringPi.h>
 
 wro::DistanceSensor::DistanceSensor()
 {
@@ -42,7 +45,6 @@ void wro::DistanceSensor::measureDistance(
 	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
 {
 	while (digitalRead(pin) == LOW &&
-		std::chrono::duration_cast<std::chrono::milliseconds>
 		(std::chrono::high_resolution_clock::now() - tTrigger) < std::chrono::milliseconds(15))
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
 

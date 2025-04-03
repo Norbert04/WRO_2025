@@ -1,14 +1,12 @@
 #pragma once
+
 #include <array>
 #include <chrono>
-#include <thread>
 
-#include <wiringPi.h>
+#include "Robot.h"
 
 namespace wro
 {
-	typedef unsigned char BYTE;
-
 	class DistanceSensor
 	{
 	public:

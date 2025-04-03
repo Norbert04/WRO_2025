@@ -8,8 +8,6 @@
 typedef unsigned char BYTE;
 typedef BYTE PIN;
 
-//sconstexpr double PI = 3.141592653589793;
-
 namespace wro
 {
 	namespace movement
@@ -26,8 +24,6 @@ namespace wro
 		constexpr PIN P_STEERING = 10;
 		constexpr BYTE ANALOGUE_READ_RESOLUTION = 1023;
 		constexpr float OPERATING_VOLTAGE = 5.0;
-		
-		extern Servo motorSteering;
 	}
 }
 #endif // !MOVEMENT_H

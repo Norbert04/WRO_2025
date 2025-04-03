@@ -1,6 +1,5 @@
 #include <wiringPi.h>
 
-#include <fstream>
 #include <cstdlib>
 #include <iostream>
 
@@ -20,9 +19,7 @@ int main() {
 		while (digitalRead(BUTTON_PIN) == HIGH) {
 			delay(100);
 		}
-		std::cout << "Button pressed, starting main" << std::endl;
 #if defined(DEBUG) || defined(_DEBUG)
-
 		std::cout << "Button pressed, starting main" << std::endl;
 #endif // defined(DEBUG) || defined(_DEBUG)
 
