@@ -10,6 +10,7 @@ void setup()
     handlers.steer = wro::movement::steer;
     handlers.stop = wro::movement::stop;
     wro::Connection::Get()->setEventHandlers(handlers);
+    wro::movement::init();
 }
 
 void loop()
