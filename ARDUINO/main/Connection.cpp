@@ -97,7 +97,7 @@ void wro::Connection::handleEvent()
 		case connectionCode::drive:
 		{
 			float speed = 0.0;
-			uint8_t buffer[sizeof(float)];  
+			BYTE buffer[sizeof(float)];  
 
 			// Wait until enough bytes are available
 			while (Serial.available() < sizeof(float));
@@ -115,7 +115,7 @@ void wro::Connection::handleEvent()
 		case connectionCode::steer:
 		{
 			int angle = 0;
-			uint8_t buffer[sizeof(int)];
+			BYTE buffer[sizeof(int)];
 
 			while (Serial.available() < sizeof(int));
 
