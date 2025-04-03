@@ -5,11 +5,13 @@
 
 void setup()
 {
+    pinMode(13, OUTPUT); 
     wro::EventHandlers handlers{ NULL };
     handlers.drive = wro::movement::drive;
     handlers.steer = wro::movement::steer;
     handlers.stop = wro::movement::stop;
     wro::Connection::Get()->setEventHandlers(handlers);
+    wro::movement::init();
 }
 
 void loop()

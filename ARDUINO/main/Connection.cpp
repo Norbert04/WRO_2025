@@ -75,68 +75,62 @@ void wro::Connection::handleEvent()
 {
 	while (Serial.available() > 0)
 	{
+		
 		const BYTE type = (BYTE)(Serial.read());
 		switch (type)
 		{
 		case connectionCode::connect:
 			eventHandlers.connect();
 			break;
+			
 		case connectionCode::error:
-		{
-			BYTE len = 0;
-			char* error = getMessage(len);
-			eventHandlers.error(error, len);
-			break;
-		}
 		case connectionCode::message:
-		{
-			BYTE len = 0;
-			char* msg = getMessage(len);
-			eventHandlers.message(msg, len);
-			break;
-		}
 		case connectionCode::debug:
 		{
 			BYTE len = 0;
 			char* msg = getMessage(len);
-			eventHandlers.debug(msg, len);
+			//eventHandlers.debug(msg, len);
 			break;
 		}
+		
 		case connectionCode::drive:
 		{
 			float speed = 0.0;
-			BYTE* buffer = new BYTE[sizeof(float)];
-			if (Serial.available() < sizeof(float))
-			{
-				delay(5);
-				if (Serial.available() < sizeof(float))
-					sendMessage("Failed to receive serial data");
-			}
+			uint8_t buffer[sizeof(float)];  // No need for dynamic allocation
+
+			// Wait until enough bytes are available
+			while (Serial.available() < sizeof(float));
+
+			// Read bytes into buffer
 			Serial.readBytes(buffer, sizeof(float));
-			memcpy(buffer, &speed, sizeof(float));
+
+			// Copy received bytes into speed variable
+			memcpy(&speed, buffer, sizeof(float));
+
 			eventHandlers.drive(speed);
-			delete[] buffer;
 			break;
 		}
+		
 		case connectionCode::steer:
 		{
+
 			int angle = 0;
-			BYTE* buffer = new BYTE[sizeof(float)];
-			if (Serial.available() < sizeof(int))
-			{
-				delay(2);
-				if (Serial.available() < sizeof(int))
-					sendMessage("Failed to receive serial data");
-			}
+			uint8_t buffer[sizeof(int)];
+
+			while (Serial.available() < sizeof(int));
+
 			Serial.readBytes(buffer, sizeof(int));
-			memcpy(buffer, &angle, sizeof(int));
+
+			memcpy(&angle, buffer, sizeof(int));
+
 			eventHandlers.steer(angle);
-			delete[] buffer;
 			break;
 		}
+		
 		case connectionCode::stopMovement:
 			eventHandlers.stop();
 			break;
+			
 		default:
 			sendMessage("Failed to decode serial data");
 			break;
@@ -146,24 +140,34 @@ void wro::Connection::handleEvent()
 
 char* wro::Connection::getMessage(BYTE& len) const
 {
-	if (Serial.available() == 0)
-	{
-		delay(2);
-		if (Serial.available() == 0)
-			sendMessage("Failed to receive serial data");
-	}
-	len = (BYTE)(Serial.read());
-	if (Serial.available() < len && len <= 64)
-	{
-		delay(5);
-		if (Serial.available() < len)
-			sendMessage("Failed to receive serial data");
-	}
-	char* result = new char[len];
-	for (BYTE i = 0; i < len; i++)
-		Serial.readBytes(result, len);
-	return result;
+    // Wait until at least 1 byte is available (the length byte)
+    while (Serial.available() == 0);
+
+    // Read message length
+    len = (BYTE)(Serial.read());
+
+    // Validate length (prevent buffer overflow)
+    if (len == 0 || len > 64) {
+        sendMessage("Invalid message length received");
+        len = 0;
+        return nullptr;
+    }
+
+    // Wait until all bytes are available
+    while (Serial.available() < len);
+
+    // Allocate memory for the message
+    char* result = new char[len + 1];  // +1 for null-termination (optional)
+
+    // Read the message into the buffer
+    Serial.readBytes(result, len);
+
+    // Optional: Null-terminate the string for safety
+    result[len] = '\0';
+
+    return result;
 }
+
 
 bool wro::Connection::valid() const
 {

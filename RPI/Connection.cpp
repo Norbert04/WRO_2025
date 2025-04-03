@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <wiringSerial.h>
+#include <wiringPi.h>
 
 wro::Connection* wro::Connection::connection{ nullptr };
 
@@ -113,6 +114,7 @@ void wro::Connection::drive(float speed) const
 
 void wro::Connection::steer(short angle) const
 {
+	std::cout << "called steer" << std::endl;
 	serialPutchar(fileDescriptor, connectionCode::steer);
 	char* temp = toSerial(angle);
 	for (BYTE i = 0; i < sizeof(short); i++)

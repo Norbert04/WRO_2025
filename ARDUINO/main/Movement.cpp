@@ -14,7 +14,6 @@ void wro::movement::init()
 	pinMode(P_DRV_BACKWARD, OUTPUT);
 	pinMode(P_DRV_SPEED, OUTPUT);
 	motorSteering.attach(P_STEERING);
-	motorSteering.write(90);
 }
 
 void wro::movement::drive(float speed)
