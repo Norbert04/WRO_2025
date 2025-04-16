@@ -9,9 +9,15 @@ namespace wro
 	public:
 		Camera();
 		~Camera();
-		bool getImage(cv::Mat& image);
+		void run();
 
 	private:
 		cv::VideoCapture camera{};
+		cv::Ptr<cv::Tracker> tracker;
+		bool tracking = false;
+		cv::Rect trackedBox;
+
+		void detectAndStartTracking(const cv::Mat& hsv, const cv::Mat& frame);
+		float calculateSteeringFromTrackedObject(int frameWidth);
 	};
 }
