@@ -38,8 +38,8 @@ namespace wro
 		static Connection* Get();
 		static void End();
 
-		Connection(const Connection& other) = delete; // rule of three
-		Connection& operator=(const Connection& other) = delete; // rule of three
+		Connection(const Connection& other) = delete;
+		Connection& operator=(const Connection& other) = delete;
 
 		void sendMessage(char* message) const;
 		void sendDebug(char* information) const;

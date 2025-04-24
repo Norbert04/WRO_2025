@@ -1,4 +1,4 @@
-#include "DistaceSensor.h"
+#include "DistanceSensor.h"
 
 #include <thread>
 #include <wiringPi.h>
@@ -42,7 +42,7 @@ std::array<double, 4> wro::DistanceSensor::getLastValues() const
 }
 
 void wro::DistanceSensor::measureDistance(
-	BYTE pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
+	PIN pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
 {
 	while (digitalRead(pin) == LOW &&
 		(std::chrono::high_resolution_clock::now() - tTrigger) < std::chrono::milliseconds(15))

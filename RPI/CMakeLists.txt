@@ -1,5 +1,5 @@
 ﻿# Add source to this project's executable.
-add_executable (WRO_2025 "WRO_2025.cpp" "Connection.cpp" "Movement.cpp" "DistanceSensor.cpp" "Camera.cpp" "Movement.h" "Connection.h" "DistaceSensor.h" "Camera.h" "Robot.h")
+add_executable (WRO_2025 "WRO_2025.cpp" "Connection.cpp" "Movement.cpp" "DistanceSensor.cpp" "Camera.cpp" "Robot.cpp" "Movement.h" "Connection.h" "DistanceSensor.h" "Camera.h" "Robot.h" "utils.h")
 
 find_library(WIRINGPI_LIBRARIES NAMES wiringPi)
 find_package(OpenCV REQUIRED)

@@ -1,9 +1,9 @@
 #include "Camera.h"
 
+#include <iostream>
+#include <opencv2/core/ocl.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
-#include <opencv2/core/ocl.hpp>
-#include <iostream>
 
 // I have literally no idea if this will work
 
@@ -16,10 +16,6 @@ wro::Camera::Camera()
 	}
 }
 
-wro::Camera::~Camera()
-{
-}
-
 void wro::Camera::detectAndStartTracking(const cv::Mat& hsv, const cv::Mat& frame)
 {
 	// Red & green HSV ranges
@@ -28,10 +24,10 @@ void wro::Camera::detectAndStartTracking(const cv::Mat& hsv, const cv::Mat& fram
 	cv::Scalar lower_green(40, 40, 40), upper_green(90, 255, 255);
 
 	// Masks
-	cv::Mat mask_red1; 
-	cv::Mat mask_red2; 
-	cv::Mat mask_red; 
-	cv::Mat mask_green; 
+	cv::Mat mask_red1;
+	cv::Mat mask_red2;
+	cv::Mat mask_red;
+	cv::Mat mask_green;
 	cv::Mat mask;
 
 	cv::inRange(hsv, lower_red1, upper_red1, mask_red1);
@@ -45,11 +41,13 @@ void wro::Camera::detectAndStartTracking(const cv::Mat& hsv, const cv::Mat& fram
 	cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 	// For each contour
-	for (const auto& cnt : contours) {
+	for (const auto& cnt : contours)
+	{
 		double area = contourArea(cnt);
 		// If more than 1000 pixels, then count as object
 		// TODO: test values
-		if (area > 1000) {
+		if (area > 1000)
+		{
 			cv::Rect box = boundingRect(cnt);
 			tracker = cv::TrackerKCF::create();
 			tracker->init(frame, box);
@@ -67,14 +65,16 @@ float wro::Camera::calculateSteeringFromTrackedObject(int frameWidth)
 	return float(cx - frameWidth / 2) / (frameWidth / 2); // -1 left to +1 right
 }
 
-void wro::Camera::run()
+void wro::Camera::runTest()
 {
 	cv::Mat frame;
 
-	while (true) {
-		if (!camera.read(frame)) {
+	while (true)
+	{
+		// TODO replace with run()?
+		if (!camera.read(frame))
+		{
 			std::cerr << "Failed to read frame\n";
-			break;
 		}
 
 		cv::Mat blurred;
@@ -83,33 +83,97 @@ void wro::Camera::run()
 		cv::GaussianBlur(frame, blurred, cv::Size(5, 5), 0);
 		cv::cvtColor(blurred, hsv, cv::COLOR_BGR2HSV);
 
-		if (!tracking) {
+		if (!tracking)
+		{
 			detectAndStartTracking(hsv, frame);
-		} else {
+		}
+		else
+		{
 			bool ok = tracker->update(frame, trackedBox);
-			if (ok) {
+			if (ok)
+			{
 				// Draw tracking box
 				cv::rectangle(frame, trackedBox, cv::Scalar(255, 0, 0), 2);
 
 				float steer = calculateSteeringFromTrackedObject(frame.cols);
 
 				// TODO: implement steering and return to center after passing object
-				if (abs(steer) < 0.2) {
-					std::cout << "Obstacle infront" << std::endl;
+				if (abs(steer) < 0.2)
+				{
+					std::cout << "Obstacle in front" << std::endl;
 				}
-				else if (steer < 0) {
+				else if (steer < 0)
+				{
 					std::cout << "Obstacle on left, steer=" << steer << ")\n";
 				}
-				else {
+				else
+				{
 					std::cout << "Obstacle on right, steer=" << steer << ")\n";
 				}
 			}
-			else {
+			else
+			{
 				std::cout << "Lost tracking\n";
 				tracking = false;
 			}
 		}
-
 		cv::imshow("Frame", frame);
 	}
+}
+
+void wro::Camera::run()
+{
+	cv::Mat frame;
+	if (!camera.read(frame))
+	{
+		std::cerr << "Failed to read frame\n";
+		return;
+	}
+
+	cv::Mat blurred;
+	// Result image
+	cv::Mat hsv;
+	cv::GaussianBlur(frame, blurred, cv::Size(5, 5), 0);
+	cv::cvtColor(blurred, hsv, cv::COLOR_BGR2HSV);
+
+	if (!tracking)
+	{
+		detectAndStartTracking(hsv, frame);
+	}
+	else
+	{
+		bool ok = tracker->update(frame, trackedBox);
+		if (ok)
+		{
+			// Draw tracking box
+			cv::rectangle(frame, trackedBox, cv::Scalar(255, 0, 0), 2);
+
+			float steer = calculateSteeringFromTrackedObject(frame.cols);
+
+			// TODO: implement steering and return to center after passing object
+			if (abs(steer) < 0.2)
+			{
+				std::cout << "Obstacle in front" << std::endl;
+			}
+			else if (steer < 0)
+			{
+				std::cout << "Obstacle on left, steer=" << steer << ")\n";
+			}
+			else
+			{
+				std::cout << "Obstacle on right, steer=" << steer << ")\n";
+			}
+		}
+		else
+		{
+			std::cout << "Lost tracking\n";
+			tracking = false;
+		}
+	}
+}
+
+std::optional<bool> wro::Camera::estimateDrivingDirection()
+{
+	// TODO implement
+	return std::optional<bool>();
 }

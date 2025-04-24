@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <opencv2/opencv.hpp>
 
 namespace wro
@@ -8,8 +10,11 @@ namespace wro
 	{
 	public:
 		Camera();
-		~Camera();
+
+		[[noreturn]] void runTest();
 		void run();
+
+		std::optional<bool> estimateDrivingDirection();
 
 	private:
 		cv::VideoCapture camera{};

@@ -75,14 +75,14 @@ void wro::Connection::handleEvent()
 {
 	while (Serial.available() > 0)
 	{
-		
+
 		const BYTE type = (BYTE)(Serial.read());
 		switch (type)
 		{
 		case connectionCode::connect:
 			eventHandlers.connect();
 			break;
-			
+
 		case connectionCode::error:
 		case connectionCode::message:
 		case connectionCode::debug:
@@ -93,11 +93,11 @@ void wro::Connection::handleEvent()
 			//eventHandlers.debug(msg, len);
 			break;
 		}
-		
+
 		case connectionCode::drive:
 		{
 			float speed = 0.0;
-			BYTE buffer[sizeof(float)];  
+			BYTE buffer[sizeof(float)];
 
 			// Wait until enough bytes are available
 			while (Serial.available() < sizeof(float));
@@ -111,7 +111,7 @@ void wro::Connection::handleEvent()
 			eventHandlers.drive(speed);
 			break;
 		}
-		
+
 		case connectionCode::steer:
 		{
 			int angle = 0;
@@ -126,11 +126,11 @@ void wro::Connection::handleEvent()
 			eventHandlers.steer(angle);
 			break;
 		}
-		
+
 		case connectionCode::stopMovement:
 			eventHandlers.stop();
 			break;
-			
+
 		default:
 			sendMessage("Failed to decode serial data");
 			break;
@@ -140,28 +140,28 @@ void wro::Connection::handleEvent()
 
 char* wro::Connection::getMessage(BYTE& length) const
 {
-    // Wait until at least 1 byte is available 
-    while (Serial.available() == 0);
+	// Wait until at least 1 byte is available 
+	while (Serial.available() == 0);
 
-    length = (BYTE)(Serial.read());
+	length = (BYTE)(Serial.read());
 
-    if (length == 0 || length > 64) {
-        sendMessage("Invalid message length received");
-        length = 0;
-        return nullptr;
-    }
+	if (length == 0 || length > 64) {
+		sendMessage("Invalid message length received");
+		length = 0;
+		return nullptr;
+	}
 
-    // Wait until all bytes are available
-    while (Serial.available() < length);
+	// Wait until all bytes are available
+	while (Serial.available() < length);
 
-    char* result = new char[length + 1]; 
+	char* result = new char[length + 1];
 
-    // Read the message into the buffer
-    Serial.readBytes(result, length);
+	// Read the message into the buffer
+	Serial.readBytes(result, length);
 
-    result[length] = '\0';
+	result[length] = '\0';
 
-    return result;
+	return result;
 }
 
 
