@@ -52,12 +52,11 @@ namespace wro
 	private:
 		void updatePosition(); // should be called before changing angle or speed
 
-		// TODO add correct data
-		static constexpr double width = 1; // cm
-		static constexpr double length = 1; // cm
+		static constexpr double width = 19.2; // cm
+		static constexpr double length = 30; // cm
 
-		static constexpr double wheelbase = 1; // cm
-		static constexpr double trackWidth = 1; // cm
+		static constexpr double wheelbase = 21.5; // cm
+		static constexpr double trackWidth = 14.64; // cm
 		static constexpr double wheelDiameter = 6.6; // cm
 
 		static constexpr short maxRPM = 326 * 0.5; // motorRPM * gearRatio
