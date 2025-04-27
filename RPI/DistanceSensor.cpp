@@ -3,6 +3,8 @@
 #include <thread>
 #include <wiringPi.h>
 
+#include "utils.h"
+
 wro::DistanceSensor::DistanceSensor()
 {
 	pinMode(P_TRIGGER, OUTPUT);
@@ -26,7 +28,7 @@ std::array<double, 4> wro::DistanceSensor::update()
 	{
 		threads[i] = std::thread(measureDistance, P_FRONT + i, tTrigger, std::ref(distances[i]));
 	}
-	std::this_thread::sleep_until(tTrigger + std::chrono::microseconds(15)); // sensor is triggered by a 15us pulse
+	std::this_thread::sleep_until(tTrigger + std::chrono::microseconds(10)); // sensor is triggered by a 10us pulse
 	digitalWrite(P_TRIGGER, LOW);
 	for (BYTE i = 0; i < 4; i++)
 	{
@@ -47,7 +49,6 @@ void wro::DistanceSensor::measureDistance(
 	while (digitalRead(pin) == LOW &&
 		(std::chrono::high_resolution_clock::now() - tTrigger) < std::chrono::milliseconds(15))
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
-
 	const std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - tTrigger;
 	distance = (t.count() * V_SOUND) / 2;
 	if (distance > 400) // object is more than 4m away

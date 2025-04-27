@@ -3,6 +3,17 @@
 #include <concepts>
 #include <numbers>
 
+#if defined(DEBUG) || defined(_DEBUG)
+#include <iostream>
+#define DEBUG_PRINT(a) std::cout << a
+#define DEBUG_PRINT_ERR(a) std::cerr << a
+#define DEBUG_PRINTLN(a) std::cout << a << "\n"
+#else
+#define DEBUG_PRINT(a) (void)0
+#define DEBUG_PRINT_ERR(a) (void)0
+#define DEBUG_PRINTLN(a) (void)0
+#endif // #if defined(DEBUG) || defined(_DEBUG)
+
 namespace wro
 {
 	template <typename T>

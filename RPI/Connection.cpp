@@ -5,7 +5,8 @@
 #include <iostream>
 #include <thread>
 #include <wiringSerial.h>
-#include <wiringPi.h>
+
+#include "utils.h"
 
 wro::Connection* wro::Connection::connection{ nullptr };
 
@@ -19,16 +20,12 @@ wro::Connection::Connection()
 	std::optional<BYTE> result = waitForNext(10);
 	if (!result)
 	{
-#if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "waiting 5 more milliseconds for response\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINTLN("waiting 5 more milliseconds for response");
 		result = waitForNext(5);
 	}
 	if (result && *result == connectionCode::connect)
 	{
-#if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "creating connection succeeded\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINTLN("creating connection succeeded");
 	}
 	else
 		std::cerr << "creating connection failed\n";
@@ -59,14 +56,10 @@ void wro::Connection::sendMessage(const std::string message) const
 		serialPutchar(fileDescriptor, connectionCode::message);
 		serialPutchar(fileDescriptor, message.size());
 		serialPuts(fileDescriptor, message.c_str());
-#if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "sent message " << message << "\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINTLN("sent message " << message);
 	}
-#if defined(DEBUG) || defined(_DEBUG)
 	else
-		std::cerr << "failed to send message\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINT_ERR("failed to send message\n");
 }
 
 void wro::Connection::sendDebug(const std::string information) const
@@ -76,14 +69,10 @@ void wro::Connection::sendDebug(const std::string information) const
 		serialPutchar(fileDescriptor, connectionCode::debug);
 		serialPutchar(fileDescriptor, information.size());
 		serialPuts(fileDescriptor, information.c_str());
-#if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "sent debug info " << information << "\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINTLN("sent debug info " << information);
 	}
-#if defined(DEBUG) || defined(_DEBUG)
 	else
-		std::cerr << "failed to send debug info\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINT_ERR("failed to send debug info\n");
 }
 
 void wro::Connection::sendError(const std::string error) const
@@ -93,14 +82,10 @@ void wro::Connection::sendError(const std::string error) const
 		serialPutchar(fileDescriptor, connectionCode::debug);
 		serialPutchar(fileDescriptor, error.size());
 		serialPuts(fileDescriptor, error.c_str());
-#if defined(DEBUG) || defined(_DEBUG)
-		std::cout << "sent error info " << error << "\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINTLN("sent error info " << error);
 	}
-#if defined(DEBUG) || defined(_DEBUG)
 	else
-		std::cerr << "failed to send error info\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+		DEBUG_PRINT_ERR("failed to send error info\n");
 }
 
 void wro::Connection::drive(float speed) const
@@ -129,24 +114,18 @@ void wro::Connection::stopMovement() const
 
 BYTE wro::Connection::waitForNext() const
 {
-#if defined(DEBUG) || defined(_DEBUG)
-	std::cout << "waiting for response\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+	DEBUG_PRINTLN("waiting for response");
 
 	while (serialDataAvail(fileDescriptor) <= 0)
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
-#if defined(DEBUG) || defined(_DEBUG)
-	std::cout << "received some serial data\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+	DEBUG_PRINTLN("received some serial data");
 
 	return serialGetchar(fileDescriptor);
 }
 
 std::optional<BYTE> wro::Connection::waitForNext(unsigned int ms) const
 {
-#if defined(DEBUG) || defined(_DEBUG)
-	std::cout << "waiting for response\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+	DEBUG_PRINTLN("waiting for response");
 	unsigned int t = 0;
 	while (serialDataAvail(fileDescriptor) <= 0)
 	{
@@ -155,18 +134,14 @@ std::optional<BYTE> wro::Connection::waitForNext(unsigned int ms) const
 		if (t >= ms)
 			return std::nullopt;
 	}
-#if defined(DEBUG) || defined(_DEBUG)
-	std::cout << "received some serial data\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+	DEBUG_PRINTLN("received some serial data");
 
 	return serialGetchar(fileDescriptor);
 }
 
 std::string wro::Connection::getMessage() const
 {
-#if defined(DEBUG) || defined(_DEBUG)
-	std::cout << "reading string from serial\n";
-#endif // defined(DEBUG) || defined(_DEBUG)
+	DEBUG_PRINTLN("reading string from serial");
 
 	std::string result;
 	const BYTE len = serialGetchar(fileDescriptor);

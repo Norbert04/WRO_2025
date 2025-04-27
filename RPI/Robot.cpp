@@ -16,6 +16,7 @@ wro::Robot::Robot()
 
 wro::Robot::~Robot()
 {
+	stopMovement();
 	wro::Connection::End();
 }
 

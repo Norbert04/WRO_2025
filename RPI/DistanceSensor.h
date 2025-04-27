@@ -28,6 +28,6 @@ namespace wro
 		static constexpr PIN P_FRONT = 23;
 		static constexpr PIN P_BACK = 24;
 		static constexpr PIN P_LEFT = 25;
-		static constexpr PIN P_RIGHT = 26;
+		static constexpr PIN P_RIGHT = 27;
 	};
 }
