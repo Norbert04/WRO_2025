@@ -9,7 +9,7 @@
 
 wro::Camera::Camera()
 {
-	if (!camera.open(0))
+	if (!camera.open("libcamerasrc ! videoconvert ! appsink", cv::CAP_GSTREAMER))
 	{
 		std::cerr << "Failed to open camera device\n";
 		return;
@@ -117,7 +117,6 @@ void wro::Camera::runTest()
 				tracking = false;
 			}
 		}
-		cv::imshow("Frame", frame);
 	}
 }
 

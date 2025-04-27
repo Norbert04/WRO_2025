@@ -1,10 +1,20 @@
-﻿#include "Movement.h"
+﻿#include <wiringPi.h>
+
+#include "Camera.h"
+#include "Robot.h"
 
 int main()
 {
-	wro::movement::drive(1);
-	wro::movement::steer(20);
-	wro::movement::stop();
+	if (wiringPiSetup() != 0)
+	{
+		std::cerr << "WiringPi setup failed\n";
+		return -1;
+	}
+
+	// wro::Robot robot = wro::Robot();
+
+	wro::Camera cam{};
+	cam.runTest();
 
 	return 0;
 }
