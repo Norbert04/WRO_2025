@@ -7,6 +7,8 @@
 #include "Robot.h"
 #include "utils.h"
 
+// #define TEST // use to skip start with button press
+
 int main()
 {
 	constexpr int P_BUTTON_START = 27;
@@ -17,10 +19,11 @@ int main()
 		return -1;
 	}
 
+	wro::Robot robot = wro::Robot();
+
+#ifndef TEST
 	pinMode(P_BUTTON_START, INPUT);
 	pullUpDnControl(P_BUTTON_START, PUD_UP);
-
-	wro::Robot robot = wro::Robot();
 
 	while (digitalRead(BUTTON_PIN) == HIGH)
 	{
@@ -28,6 +31,7 @@ int main()
 	}
 
 	DEBUG_PRINTLN("Button pressed, starting execution");
+#endif // !TEST
 	{ // main
 
 		wro::Camera cam{};
