@@ -1,28 +1,19 @@
 #pragma once
 
-#include <optional>
-
 #include <opencv2/opencv.hpp>
 
-namespace wro
-{
-	class Camera
-	{
-	public:
-		Camera();
+namespace wro {
+class Camera {
+   public:
+    Camera();
+    ~Camera();
+    void run();
 
-		[[noreturn]] void runTest();
-		void run();
+   private:
+    cv::VideoCapture camera{};
 
-		std::optional<bool> estimateDrivingDirection();
-
-	private:
-		cv::VideoCapture camera{};
-		cv::Ptr<cv::Tracker> tracker;
-		bool tracking = false;
-		cv::Rect trackedBox;
-
-		void detectAndStartTracking(const cv::Mat& hsv, const cv::Mat& frame);
-		float calculateSteeringFromTrackedObject(int frameWidth);
-	};
+    std::vector<DetectedBlock> detectedBlocks(const cv::Mat& frame);
+    int calculateSteeringAngle(int frameWidth, int targetXHorizontal, int currentXHorizontal);
+    void run();
+};
 }
