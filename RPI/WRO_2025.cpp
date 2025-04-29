@@ -11,9 +11,9 @@
 
 int main()
 {
-	constexpr int P_BUTTON_START = 27;
+	constexpr int P_BUTTON_START = 16;
 
-	if (wiringPiSetup() != 0)
+	if (wiringPiSetupGpio() != 0)
 	{
 		std::cerr << "WiringPi setup failed\n";
 		return -1;
