@@ -8,6 +8,17 @@ typedef BYTE PIN;
 
 namespace wro
 {
+	namespace directions
+	{
+		enum directions : BYTE
+		{
+			front,
+			left,
+			back,
+			right
+		};
+	}
+
 	class DistanceSensor
 	{
 	public:
@@ -21,7 +32,7 @@ namespace wro
 		static void measureDistance(PIN pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance);
 
 		std::array<double, 4> distances = // in cm
-		{ NO_DISTANCE, NO_DISTANCE, NO_DISTANCE, NO_DISTANCE }; // 0-front, 1-left,...(counter clockwise)
+		{ NO_DISTANCE, NO_DISTANCE, NO_DISTANCE, NO_DISTANCE }; // index as in directions
 
 		static constexpr unsigned int V_SOUND = 34330; // cm/s
 		static constexpr PIN P_TRIGGER = 22;
