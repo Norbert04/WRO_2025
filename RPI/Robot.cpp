@@ -9,7 +9,7 @@
 #include "Connection.h"
 
 wro::Robot::Robot()
-	:camera(), distanceSensor()
+	:camera(this), distanceSensor()
 {
 	stopMovement();
 }
@@ -44,6 +44,18 @@ void wro::Robot::steer(short angle)
 	steeringAngle = angle;
 }
 
+void wro::Robot::setSpeed(float speed)
+{
+	if (speed != this->speed)
+		drive(speed);
+}
+
+void wro::Robot::setSteeringAngle(short angle)
+{
+	if (angle != steeringAngle)
+		steer(angle);
+}
+
 std::array<double, 4> wro::Robot::updateDistances()
 {
 	return distanceSensor.update();
@@ -56,12 +68,12 @@ std::array<double, 4> wro::Robot::getLastDistances() const
 
 void wro::Robot::run()
 {
-	camera.run();
+	camera.getSteeringAngle();
 }
 
 std::optional<bool> wro::Robot::drivingDirection()
 {
-	std::optional<bool> direction = camera.estimateDrivingDirection();
+	std::optional<bool> direction = std::nullopt;
 	// TODO modify checkedDirection accordingly
 	if (direction)
 	{

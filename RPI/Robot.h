@@ -26,6 +26,19 @@ namespace wro
 
 	}
 
+	// State Machine
+	enum class State
+	{
+		IDLE,
+		DRIVING_STRAIGHT,
+		AVOIDING_RED,
+		AVOIDING_GREEN,
+		TURNING_LEFT,
+		TURNING_RIGHT, // Optional
+		CENTERING,
+		STOPPED
+	};
+
 	class Robot
 	{
 	public:
@@ -37,6 +50,9 @@ namespace wro
 		void stopMovement();
 		void steer(short angle);// angle of wheels in degree
 
+		void setSpeed(float speed);// -1 < speed < 1
+		void setSteeringAngle(short angle);// angle of wheels in degree
+
 		// distances
 		std::array<double, 4> updateDistances();
 		std::array<double, 4> getLastDistances() const;
@@ -44,10 +60,24 @@ namespace wro
 		//camera
 		void run(); // runs camera loop
 
-		std::optional<bool> drivingDirection(); // true -> clockwise; false -> counterclockwise
+		std::optional<bool> drivingDirection(); // true -> clockwise; false -> counter clockwise
 
 		Point<unsigned int> estimatePosition(); // in mm starting in top-left edge
 		double estimateAngle(); // in rad
+
+		State currentState = State::IDLE;
+
+		// TODO move/ structure constants
+		// Driving Control Parameters
+		static constexpr float FORWARD_SPEED = 0.75f;    // Motor speed when driving straight
+		static constexpr float AVOIDANCE_SPEED = 0.5f;  // Motor speed when avoiding
+		static constexpr float TURN_SPEED = 0.5f;       // Motor speed during 90-degree turns
+
+		static constexpr double TURN_DURATION_SEC = 2.0;
+
+		static constexpr int SERVO_CENTRE = 90;
+		static constexpr int SERVO_MAX_LEFT = 45;
+		static constexpr int SERVO_MAX_RIGHT = 135;
 
 	private:
 		void updatePosition(); // should be called before changing angle or speed
@@ -63,7 +93,7 @@ namespace wro
 
 		Point<unsigned int> position = { 0,0 }; // in mm starting in top-left edge
 		double angle = 0; // rad
-		bool checkedDirection = false; // if direction is counterclockwise the starting angle must be 180 degrees
+		bool checkedDirection = false; // if direction is counter clockwise the starting angle must be 180 degrees
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> lastPositionUpdate;
 
