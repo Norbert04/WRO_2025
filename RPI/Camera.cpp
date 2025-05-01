@@ -154,10 +154,10 @@ int wro::Camera::calculateSteeringAngle(int frameWidth, int targetXHorizontal, i
 	double normedError = error / (static_cast<double>(frameWidth) / 2.0);
 
 	// Calculate steering adjustment based on Error and Gain
-	double steeringAdjustment = normedError * (wro::Robot::SERVO_MAX_RIGHT - wro::Robot::SERVO_CENTRE) * STEERING_GAIN;
+	double steeringAdjustment = normedError * (wro::Robot::SERVO_MAX_RIGHT - wro::Robot::SERVO_CENTER) * STEERING_GAIN;
 
 	// Calculate Target Servo Angle
-	int targetAngle = static_cast<int>(round(wro::Robot::SERVO_CENTRE + steeringAdjustment));
+	int targetAngle = static_cast<int>(round(wro::Robot::SERVO_CENTER + steeringAdjustment));
 
 	// Servo limits
 	targetAngle = std::max(wro::Robot::SERVO_MAX_LEFT, std::min(wro::Robot::SERVO_MAX_RIGHT, targetAngle));
@@ -176,13 +176,13 @@ short wro::Camera::getSteeringAngle()
 	{
 		std::cerr << "Failed to read frame\n";
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		return wro::Robot::SERVO_CENTRE;
+		return wro::Robot::SERVO_CENTER;
 	}
 
 	// Get blocks
 	std::vector<DetectedBlock> blocks = wro::Camera::detectedBlocks(frame);
 
-	short steeringAngle = wro::Robot::SERVO_CENTRE;
+	short steeringAngle = wro::Robot::SERVO_CENTER;
 	std::string stateString = "UNKNOWN";  // For logging
 
 	switch (robot->currentState)
@@ -249,7 +249,7 @@ short wro::Camera::getSteeringAngle()
 			{
 				DEBUG_PRINTLN("Lost red block while avoiding: CENTERING");
 				robot->currentState = State::CENTERING;
-				steeringAngle = wro::Robot::SERVO_CENTRE;
+				steeringAngle = wro::Robot::SERVO_CENTER;
 			}
 		}
 		break;
@@ -280,7 +280,7 @@ short wro::Camera::getSteeringAngle()
 			{
 				DEBUG_PRINTLN("Lost green block while avoiding: CENTERING");
 				robot->currentState = State::CENTERING;
-				steeringAngle = wro::Robot::SERVO_CENTRE;
+				steeringAngle = wro::Robot::SERVO_CENTER;
 			}
 		}
 		break;
@@ -289,7 +289,7 @@ short wro::Camera::getSteeringAngle()
 		stateString = "CENTERING";
 		steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, frameCentreX, frameCentreX);
 		// Transition back when steering is close to centre
-		if (std::abs(steeringAngle - wro::Robot::SERVO_CENTRE) < 5)
+		if (std::abs(steeringAngle - wro::Robot::SERVO_CENTER) < 5)
 		{
 			DEBUG_PRINTLN("Centring done now DRIVING_STRAIGHT");
 			robot->currentState = State::DRIVING_STRAIGHT;
@@ -312,12 +312,12 @@ short wro::Camera::getSteeringAngle()
 				{
 					DEBUG_PRINTLN("STOPPED, finished laps");
 					robot->currentState = State::STOPPED;
-					steeringAngle = wro::Robot::SERVO_CENTRE;
+					steeringAngle = wro::Robot::SERVO_CENTER;
 				}
 				else
 				{
 					robot->currentState = State::DRIVING_STRAIGHT;
-					steeringAngle = wro::Robot::SERVO_CENTRE;  // Straighten wheels
+					steeringAngle = wro::Robot::SERVO_CENTER;  // Straighten wheels
 				}
 			}
 		}
@@ -325,13 +325,12 @@ short wro::Camera::getSteeringAngle()
 
 	case State::STOPPED:
 		stateString = "STOPPED";
-		steeringAngle = wro::Robot::SERVO_CENTRE;
-		// TODO: Now it stays stopped unless manually restarted, maybe add logic with button
+		steeringAngle = wro::Robot::SERVO_CENTER;
 		break;
 
 	default:  // Include IDLE or any other state
 		stateString = "IDLE/UNKNOWN";
-		steeringAngle = wro::Robot::SERVO_CENTRE;
+		steeringAngle = wro::Robot::SERVO_CENTER;
 		// Default to stopping
 		robot->currentState = State::STOPPED;
 		break;

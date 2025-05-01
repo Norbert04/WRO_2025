@@ -36,7 +36,11 @@ namespace wro
 		TURNING_LEFT,
 		TURNING_RIGHT, // Optional
 		CENTERING,
-		STOPPED
+		STOPPED,
+		// for opening round
+		STARTING_STRAIGHT,
+		WALL_FOLLOWING_STRAIGHT,
+		TURNING_CORNER
 	};
 
 	class Robot
@@ -75,10 +79,17 @@ namespace wro
 		static constexpr float FORWARD_SPEED = 0.75f;    // Motor speed when driving straight
 		static constexpr float AVOIDANCE_SPEED = 0.5f;  // Motor speed when avoiding
 		static constexpr float TURN_SPEED = 0.5f;       // Motor speed during 90-degree turns
+		static constexpr float OPENING_RACE_FORWARD_SPEED = 0.50f;
+		static constexpr float OPENING_RACE_TURN_SPEED = 0.50f;
+
+		// For wall following
+		static constexpr double WALL_FOLLOW_KP = 1.8;          // Proportional gain for wall following
+ 		static constexpr double WALL_FOLLOW_KD = 1.0;   
+		static constexpr int TARGET_OUTER_WALL_DISTANCE = 15;  // Target distance (cm) from the OUTER wall
 
 		static constexpr double TURN_DURATION_SEC = 2.0;
 
-		static constexpr int SERVO_CENTRE = 90;
+		static constexpr int SERVO_CENTER = 90;
 		static constexpr int SERVO_MAX_LEFT = 45;
 		static constexpr int SERVO_MAX_RIGHT = 135;
 
