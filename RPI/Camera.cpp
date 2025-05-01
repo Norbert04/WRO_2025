@@ -47,18 +47,8 @@ constexpr double AVOIDANCE_THRESHOLD_X_RATIO = 0.3;
 constexpr int AVOIDANCE_DISTANCE_THRESHOLD_HEIGHT = static_cast<int>(FRAME_HEIGHT * 0.15);
 
 // Global variables
-std::chrono::steady_clock::time_point turnStartTime;
-std::chrono::steady_clock::time_point lastSensorReadTime;
 int avoidanceTargetX = -1;  // Target horizontal pixel position during avoidance
 int sidesDriven = 0;        // How many sides of the square completed
-
-// TODO for NN2, warp sensor data into a class or do something else, idk
-// TODO I used following:
-//
-wro::DistanceSensor sensor;
-
-// --------------------------------------------------------------------------
-// --------------------------------------------------------------------------
 
 wro::Camera::Camera(wro::Robot* robot)
 	:robot(robot)
@@ -189,10 +179,6 @@ short wro::Camera::getSteeringAngle()
 		return wro::Robot::SERVO_CENTRE;
 	}
 
-	// TODO: Get distance sensor data here, to tired to implement this now
-	// Read Sensors Periodically
-	auto now = std::chrono::steady_clock::now();
-
 	// Get blocks
 	std::vector<DetectedBlock> blocks = wro::Camera::detectedBlocks(frame);
 
@@ -315,7 +301,8 @@ short wro::Camera::getSteeringAngle()
 		steeringAngle = wro::Robot::SERVO_MAX_LEFT;
 		{
 			auto turn_elapsed =
-				std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - turnStartTime);
+				std::chrono::duration_cast<std::chrono::duration<double>>(
+					std::chrono::high_resolution_clock::now() - robot->turnStartTime);
 			if (turn_elapsed.count() > wro::Robot::TURN_DURATION_SEC)
 			{
 				DEBUG_PRINTLN("Turn complete");

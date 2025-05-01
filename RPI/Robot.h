@@ -68,6 +68,8 @@ namespace wro
 
 		State currentState = State::IDLE;
 
+		std::chrono::high_resolution_clock::time_point turnStartTime; // TODO find a better solution for this
+
 		// TODO move/ structure constants
 		// Driving Control Parameters
 		static constexpr float FORWARD_SPEED = 0.75f;    // Motor speed when driving straight

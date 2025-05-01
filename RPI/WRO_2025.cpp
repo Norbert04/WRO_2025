@@ -37,8 +37,7 @@ int main()
 
 	// distance, by front ultrasonic sensor, at which car should stop driving straight and turn left
 	constexpr int WALL_DETECT_FRONT_TURN = 35;
-	wro::State currentState = wro::State::DRIVING_STRAIGHT;
-	std::chrono::high_resolution_clock::time_point turnStartTime;
+	robot.currentState = wro::State::DRIVING_STRAIGHT;
 
 	while (!finished(robot)) // main
 	{
@@ -48,8 +47,8 @@ int main()
 		if (currentDistances[front] != -1 && currentDistances[front] < WALL_DETECT_FRONT_TURN)
 		{
 			DEBUG_PRINTLN("Wall detected on front, turn left now");
-			currentState = wro::State::TURNING_LEFT;
-			turnStartTime = std::chrono::high_resolution_clock::now();
+			robot.currentState = wro::State::TURNING_LEFT;
+			robot.turnStartTime = std::chrono::high_resolution_clock::now();
 			robot.setSpeed(wro::Robot::TURN_SPEED);
 			robot.setSteeringAngle(wro::Robot::SERVO_MAX_LEFT);
 		}
