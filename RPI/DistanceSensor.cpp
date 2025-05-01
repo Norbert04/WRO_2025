@@ -46,10 +46,20 @@ std::array<double, 4> wro::DistanceSensor::getLastValues() const
 void wro::DistanceSensor::measureDistance(
 	PIN pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance)
 {
+	auto start = std::chrono::high_resolution_clock::now();
 	while (digitalRead(pin) == LOW &&
 		(std::chrono::high_resolution_clock::now() - tTrigger) < std::chrono::milliseconds(15))
-		std::this_thread::sleep_for(std::chrono::microseconds(10));
-	const std::chrono::duration<double> t = std::chrono::high_resolution_clock::now() - tTrigger;
+		start = std::chrono::high_resolution_clock::now();
+	if (digitalRead(pin) == LOW)
+	{
+		distance = NO_DISTANCE;
+		return;
+	}
+	auto end = std::chrono::high_resolution_clock::now();
+	while (digitalRead(pin) == LOW &&
+		(std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(15))
+		end = std::chrono::high_resolution_clock::now();
+	const std::chrono::duration<double> t = end - start;
 	distance = (t.count() * V_SOUND) / 2;
 	if (distance > 400) // object is more than 4m away
 		distance = NO_DISTANCE;

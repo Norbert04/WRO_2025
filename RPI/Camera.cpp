@@ -1,7 +1,6 @@
 #include "Camera.h"
 
 #include <algorithm>
-#include <chrono>
 #include <iostream>
 #include <opencv2/core/ocl.hpp>
 #include <opencv2/opencv.hpp>
@@ -10,7 +9,6 @@
 #include <thread>
 #include <vector>
 
-#include "DistanceSensor.h"
 #include "Robot.h"
 #include "utils.h"
 
