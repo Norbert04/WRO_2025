@@ -71,6 +71,11 @@ void wro::Robot::run()
 	camera.getSteeringAngle();
 }
 
+short wro::Robot::getCameraSteeringAngle()
+{
+	return camera.getSteeringAngle();
+}
+
 std::optional<bool> wro::Robot::drivingDirection()
 {
 	std::optional<bool> direction = std::nullopt;

@@ -181,210 +181,173 @@ short wro::Camera::getSteeringAngle()
 	const int avoidanceThresholdPixels = static_cast<int>(FRAME_WIDTH * AVOIDANCE_THRESHOLD_X_RATIO);
 
 	cv::Mat frame;
-	bool running = true;
 
-	while (running)
+	if (!camera.read(frame))
 	{
-		using namespace wro::directions;
-
-		if (!camera.read(frame))
-		{
-			std::cerr << "Failed to read frame\n";
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			continue;
-		}
-
-		// TODO: Get distance sensor data here, to tired to implement this now
-		// Read Sensors Periodically
-		auto now = std::chrono::steady_clock::now();
-
-		std::array<double, 4> sensorData;
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSensorReadTime).count() > 200)
-		{
-			sensorData = sensor.update();
-			lastSensorReadTime = now;
-		}
-
-		// Get blocks
-		std::vector<DetectedBlock> blocks = wro::Camera::detectedBlocks(frame);
-
-		int motorSpeed = 0;
-		int steeringAngle = wro::Robot::SERVO_CENTRE;
-		std::string stateString = "UNKNOWN";  // For logging
-
-		// Emergency Stop (Front Sensor)
-		if (sensorData[front] != -1 && sensorData[front] < 20)
-		{
-			if (robot->currentState != State::STOPPED)
-			{
-				std::cout << "EMERGENCY STOP - Obstacle too close! State: " << static_cast<int>(robot->currentState) << "\n";
-				robot->currentState = State::STOPPED;
-			}
-		}
-
-		switch (robot->currentState)
-		{
-		case State::DRIVING_STRAIGHT:
-			stateString = "DRIVING_STRAIGHT";
-			motorSpeed = wro::Robot::FORWARD_SPEED;
-			steeringAngle = wro::Robot::SERVO_CENTRE;
-
-			// 2. Check for blocks to avoid
-			if (!blocks.empty())
-			{
-				const auto& closest_block = blocks[0];  // Sorted by area
-				bool is_close_enough = closest_block.boundingBox.height > AVOIDANCE_DISTANCE_THRESHOLD_HEIGHT;
-				bool is_in_path = std::abs(closest_block.centre.x - frameCentreX) < avoidanceThresholdPixels;
-
-				if (is_close_enough && is_in_path)
-				{
-					// Red block
-					if (closest_block.colour == "red")
-					{
-						std::cout << "Red block detected in path. Avoiding on RIGHT" << std::endl;
-						robot->currentState = State::AVOIDING_RED;
-						// Aim a bit to the right of blocks right edge
-						avoidanceTargetX =
-							closest_block.boundingBox.x + closest_block.boundingBox.width + static_cast<int>(FRAME_WIDTH * 0.2);
-						motorSpeed = wro::Robot::AVOIDANCE_SPEED;
-					}
-					else
-					{  // Green block
-						std::cout << "Green block detected in path. Avoiding on LEFT" << std::endl;
-						robot->currentState = State::AVOIDING_GREEN;
-						// Aim a bit to the left of blocks left edge
-						avoidanceTargetX = closest_block.boundingBox.x - static_cast<int>(FRAME_WIDTH * 0.2);
-						motorSpeed = wro::Robot::AVOIDANCE_SPEED;
-					}
-					// Clamp target in frame bounds
-					avoidanceTargetX = std::max(0, std::min(FRAME_WIDTH - 1, avoidanceTargetX));
-					std::cout << "Avoidance Target X: " << avoidanceTargetX << std::endl;
-				}
-			}
-			break;
-
-		case State::AVOIDING_RED:  // Pass Right
-			stateString = "AVOIDING_RED";
-			motorSpeed = wro::Robot::AVOIDANCE_SPEED;
-			{
-				bool found_red = false;
-				for (const auto& block : blocks)
-				{
-					if (block.colour == "red")
-					{
-						// Assume the largest/first red block is to be avoided
-						cv::rectangle(frame, block.boundingBox, cv::Scalar(0, 0, 255), 2);
-						steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, avoidanceTargetX, frameCentreX);
-
-						// Check if block centre has passed to the left
-						if (block.centre.x < frameCentreX - static_cast<int>(FRAME_WIDTH * 0.1))
-						{
-							DEBUG_PRINTLN("Red block seems passed CENTERING now");
-							robot->currentState = State::CENTERING;
-							avoidanceTargetX = -1;  // Clear target
-						}
-						found_red = true;
-						break;  // Only process first block
-					}
-				}
-				if (!found_red)
-				{
-					DEBUG_PRINTLN("Lost red block while avoiding: CENTERING");
-					robot->currentState = State::CENTERING;
-					steeringAngle = wro::Robot::SERVO_CENTRE;
-				}
-			}
-			break;
-
-		case State::AVOIDING_GREEN:  // Pass Left
-			stateString = "AVOIDING_GREEN";
-			motorSpeed = wro::Robot::AVOIDANCE_SPEED;
-			{
-				bool found_green = false;
-				for (const DetectedBlock& block : blocks)
-				{
-					if (block.colour == "green")
-					{
-						cv::rectangle(frame, block.boundingBox, cv::Scalar(0, 255, 0), 2);
-						steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, avoidanceTargetX, frameCentreX);
-
-						// Check if block centre has passed to the right
-						if (block.centre.x > frameCentreX + static_cast<int>(FRAME_WIDTH * 0.1))
-						{
-							DEBUG_PRINTLN("Green block seems passed CENTERING now");
-							robot->currentState = State::CENTERING;
-							avoidanceTargetX = -1;  // Clear target
-						}
-						found_green = true;
-						break;  // Only process first block
-					}
-				}
-				if (!found_green)
-				{
-					DEBUG_PRINTLN("Lost green block while avoiding: CENTERING");
-					robot->currentState = State::CENTERING;
-					steeringAngle = wro::Robot::SERVO_CENTRE;
-				}
-			}
-			break;
-
-		case State::CENTERING:
-			stateString = "CENTERING";
-			motorSpeed = wro::Robot::FORWARD_SPEED;
-			steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, frameCentreX, frameCentreX);
-			// Transition back when steering is close to centre
-			if (std::abs(steeringAngle - wro::Robot::SERVO_CENTRE) < 5)
-			{
-				DEBUG_PRINTLN("Centring done now DRIVING_STRAIGHT");
-				robot->currentState = State::DRIVING_STRAIGHT;
-			}
-			break;
-
-		case State::TURNING_LEFT:
-			stateString = "TURNING_LEFT (" + std::to_string(sidesDriven) + ")";
-			motorSpeed = wro::Robot::TURN_SPEED;
-			steeringAngle = wro::Robot::SERVO_MAX_LEFT;
-			{
-				auto turn_elapsed =
-					std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - turnStartTime);
-				if (turn_elapsed.count() > wro::Robot::TURN_DURATION_SEC)
-				{
-					DEBUG_PRINTLN("Turn complete");
-					sidesDriven++;
-					// TODO: Change amount
-					if (sidesDriven >= 4)
-					{
-						std::cout << "STOPPED, finished laps" << std::endl;
-						robot->currentState = State::STOPPED;
-						motorSpeed = 0;
-						steeringAngle = wro::Robot::SERVO_CENTRE;
-					}
-					else
-					{
-						robot->currentState = State::DRIVING_STRAIGHT;
-						steeringAngle = wro::Robot::SERVO_CENTRE;  // Straighten wheels
-						motorSpeed = wro::Robot::FORWARD_SPEED;    // Start driving straight
-					}
-				}
-			}
-			break;
-
-		case State::STOPPED:
-			stateString = "STOPPED";
-			motorSpeed = 0;
-			steeringAngle = wro::Robot::SERVO_CENTRE;
-			// TODO: Now it stays stopped unless manually restarted, maybe add logic with button
-			break;
-
-		default:  // Include IDLE or any other state
-			stateString = "IDLE/UNKNOWN";
-			motorSpeed = 0;
-			steeringAngle = wro::Robot::SERVO_CENTRE;
-			// Default to stopping
-			robot->currentState = State::STOPPED;
-			break;
-		}
+		std::cerr << "Failed to read frame\n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		return wro::Robot::SERVO_CENTRE;
 	}
 
-	// TODO: here turn and drive with motorSpeed and steeringAngle
+	// TODO: Get distance sensor data here, to tired to implement this now
+	// Read Sensors Periodically
+	auto now = std::chrono::steady_clock::now();
+
+	// Get blocks
+	std::vector<DetectedBlock> blocks = wro::Camera::detectedBlocks(frame);
+
+	short steeringAngle = wro::Robot::SERVO_CENTRE;
+	std::string stateString = "UNKNOWN";  // For logging
+
+	switch (robot->currentState)
+	{
+	case State::DRIVING_STRAIGHT:
+		stateString = "DRIVING_STRAIGHT";
+
+		// Check for blocks to avoid
+		if (!blocks.empty())
+		{
+			const auto& closest_block = blocks[0];  // Sorted by area
+			bool is_close_enough = closest_block.boundingBox.height > AVOIDANCE_DISTANCE_THRESHOLD_HEIGHT;
+			bool is_in_path = std::abs(closest_block.centre.x - frameCentreX) < avoidanceThresholdPixels;
+
+			if (is_close_enough && is_in_path)
+			{
+				// Red block
+				if (closest_block.colour == "red")
+				{
+					DEBUG_PRINTLN("Red block detected in path. Avoiding on RIGHT");
+					robot->currentState = State::AVOIDING_RED;
+					// Aim a bit to the right of blocks right edge
+					avoidanceTargetX =
+						closest_block.boundingBox.x + closest_block.boundingBox.width + static_cast<int>(FRAME_WIDTH * 0.2);
+				}
+				else
+				{  // Green block
+					DEBUG_PRINTLN("Green block detected in path. Avoiding on LEFT");
+					robot->currentState = State::AVOIDING_GREEN;
+					// Aim a bit to the left of blocks left edge
+					avoidanceTargetX = closest_block.boundingBox.x - static_cast<int>(FRAME_WIDTH * 0.2);
+				}
+				// Clamp target in frame bounds
+				avoidanceTargetX = std::max(0, std::min(FRAME_WIDTH - 1, avoidanceTargetX));
+				DEBUG_PRINTLN("Avoidance Target X: " << avoidanceTargetX);
+			}
+		}
+		break;
+
+	case State::AVOIDING_RED:  // Pass Right
+		stateString = "AVOIDING_RED";
+		{
+			bool found_red = false;
+			for (const auto& block : blocks)
+			{
+				if (block.colour == "red")
+				{
+					// Assume the largest/first red block is to be avoided
+					cv::rectangle(frame, block.boundingBox, cv::Scalar(0, 0, 255), 2);
+					steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, avoidanceTargetX, frameCentreX);
+
+					// Check if block centre has passed to the left
+					if (block.centre.x < frameCentreX - static_cast<int>(FRAME_WIDTH * 0.1))
+					{
+						DEBUG_PRINTLN("Red block seems passed CENTERING now");
+						robot->currentState = State::CENTERING;
+						avoidanceTargetX = -1;  // Clear target
+					}
+					found_red = true;
+					break;  // Only process first block
+				}
+			}
+			if (!found_red)
+			{
+				DEBUG_PRINTLN("Lost red block while avoiding: CENTERING");
+				robot->currentState = State::CENTERING;
+				steeringAngle = wro::Robot::SERVO_CENTRE;
+			}
+		}
+		break;
+
+	case State::AVOIDING_GREEN:  // Pass Left
+		stateString = "AVOIDING_GREEN";
+		{
+			bool found_green = false;
+			for (const DetectedBlock& block : blocks)
+			{
+				if (block.colour == "green")
+				{
+					cv::rectangle(frame, block.boundingBox, cv::Scalar(0, 255, 0), 2);
+					steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, avoidanceTargetX, frameCentreX);
+
+					// Check if block centre has passed to the right
+					if (block.centre.x > frameCentreX + static_cast<int>(FRAME_WIDTH * 0.1))
+					{
+						DEBUG_PRINTLN("Green block seems passed CENTERING now");
+						robot->currentState = State::CENTERING;
+						avoidanceTargetX = -1;  // Clear target
+					}
+					found_green = true;
+					break;  // Only process first block
+				}
+			}
+			if (!found_green)
+			{
+				DEBUG_PRINTLN("Lost green block while avoiding: CENTERING");
+				robot->currentState = State::CENTERING;
+				steeringAngle = wro::Robot::SERVO_CENTRE;
+			}
+		}
+		break;
+
+	case State::CENTERING:
+		stateString = "CENTERING";
+		steeringAngle = wro::Camera::calculateSteeringAngle(FRAME_WIDTH, frameCentreX, frameCentreX);
+		// Transition back when steering is close to centre
+		if (std::abs(steeringAngle - wro::Robot::SERVO_CENTRE) < 5)
+		{
+			DEBUG_PRINTLN("Centring done now DRIVING_STRAIGHT");
+			robot->currentState = State::DRIVING_STRAIGHT;
+		}
+		break;
+
+	case State::TURNING_LEFT:
+		stateString = "TURNING_LEFT (" + std::to_string(sidesDriven) + ")";
+		steeringAngle = wro::Robot::SERVO_MAX_LEFT;
+		{
+			auto turn_elapsed =
+				std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::steady_clock::now() - turnStartTime);
+			if (turn_elapsed.count() > wro::Robot::TURN_DURATION_SEC)
+			{
+				DEBUG_PRINTLN("Turn complete");
+				sidesDriven++;
+				// TODO: Change amount
+				if (sidesDriven >= 4)
+				{
+					DEBUG_PRINTLN("STOPPED, finished laps");
+					robot->currentState = State::STOPPED;
+					steeringAngle = wro::Robot::SERVO_CENTRE;
+				}
+				else
+				{
+					robot->currentState = State::DRIVING_STRAIGHT;
+					steeringAngle = wro::Robot::SERVO_CENTRE;  // Straighten wheels
+				}
+			}
+		}
+		break;
+
+	case State::STOPPED:
+		stateString = "STOPPED";
+		steeringAngle = wro::Robot::SERVO_CENTRE;
+		// TODO: Now it stays stopped unless manually restarted, maybe add logic with button
+		break;
+
+	default:  // Include IDLE or any other state
+		stateString = "IDLE/UNKNOWN";
+		steeringAngle = wro::Robot::SERVO_CENTRE;
+		// Default to stopping
+		robot->currentState = State::STOPPED;
+		break;
+	}
+	return steeringAngle;
 }

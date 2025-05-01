@@ -44,7 +44,7 @@ int main()
 	{
 		using namespace wro::directions;
 		std::array<double, 4> currentDistances = robot.updateDistances();
-		// 1. Check for corners (Front sensor)
+		// Check for corners (Front sensor)
 		if (currentDistances[front] != -1 && currentDistances[front] < WALL_DETECT_FRONT_TURN)
 		{
 			DEBUG_PRINTLN("Wall detected on front, turn left now");
@@ -54,8 +54,42 @@ int main()
 			robot.setSteeringAngle(wro::Robot::SERVO_MAX_LEFT);
 		}
 
+		// Emergency Stop (Front Sensor)
+		if (currentDistances[front] != -1 && currentDistances[front] < 20)
+		{
+			if (robot.currentState != wro::State::STOPPED)
+			{
+				std::cout << "EMERGENCY STOP - Obstacle too close! State: " << static_cast<int>(robot.currentState) << "\n";
+				robot.currentState = wro::State::STOPPED;
+			}
+		}
 
+		switch (robot.currentState)
+		{
+		case wro::State::DRIVING_STRAIGHT:
+		case wro::State::CENTERING:
+			robot.setSpeed(wro::Robot::FORWARD_SPEED);
+			break;
 
+		case wro::State::AVOIDING_RED:  // Pass Right
+		case wro::State::AVOIDING_GREEN:  // Pass Left
+			robot.setSpeed(wro::Robot::AVOIDANCE_SPEED);
+			break;
+
+		case wro::State::TURNING_LEFT:
+			robot.setSpeed(wro::Robot::TURN_SPEED);
+			break;
+
+		case wro::State::STOPPED:
+			robot.setSpeed(0);
+			break;
+
+		default:  // Include IDLE or any other state
+			robot.setSpeed(0);
+			break;
+		}
+
+		robot.setSteeringAngle(robot.getCameraSteeringAngle());
 
 		robot.run();
 	}

@@ -59,6 +59,7 @@ namespace wro
 
 		//camera
 		void run(); // runs camera loop
+		short getCameraSteeringAngle();
 
 		std::optional<bool> drivingDirection(); // true -> clockwise; false -> counter clockwise
 
