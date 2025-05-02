@@ -13,6 +13,14 @@ IF(CMAKE_BUILD_TYPE MATCHES "Debug")
     add_compile_definitions(_DEBUG)
 ENDIF(CMAKE_BUILD_TYPE MATCHES "Debug")
 
+IF(CHALLENGE_TYPE MATCHES "open")
+    add_compile_definitions(OPEN_CHALLENGE CHALLENGE_TYPE=0)
+ENDIF(CHALLENGE_TYPE MATCHES "open")
+
+IF(CHALLENGE_TYPE MATCHES "obstacle")
+    add_compile_definitions(OBSTACLE_CHALLENGE CHALLENGE_TYPE=1)
+ENDIF(CHALLENGE_TYPE MATCHES "obstacle")
+
 project ("WRO_2025")
 
 # Include sub-projects.

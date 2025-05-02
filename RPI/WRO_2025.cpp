@@ -1,6 +1,6 @@
 ﻿#include <chrono>
-#include <thread>
 #include <cmath>
+#include <thread>
 #include <wiringPi.h>
 
 #include "Camera.h"
@@ -10,7 +10,8 @@
 // #define TEST // use to skip start with button press
 
 bool finished(wro::Robot& robot);
-int openingRoundMain();
+int obstacleChallenge(wro::Robot& robot);
+int openChallenge(wro::Robot& robot);
 double calculateOuterWallAdjustment(const std::array<double, 4> currentDistances, bool clockwise, int targetDistance, int& lastError, double kp, double kd);
 
 int main()
@@ -37,6 +38,23 @@ int main()
 	DEBUG_PRINTLN("Button pressed, starting execution");
 #endif // !TEST
 
+#ifdef OPEN_CHALLENGE
+	return openChallenge(robot);
+#elif defined(OBSTACLE_CHALLENGE)
+	return obstacleChallenge(robot);
+#else
+	return -1;
+#endif // OPEN_CHALLENGE
+}
+
+bool finished(wro::Robot& robot)
+{
+	// TODO check whether robot is back in starting section
+	return false;
+}
+
+int obstacleChallenge(wro::Robot& robot)
+{
 	// distance, by front ultrasonic sensor, at which car should stop driving straight and turn left
 	constexpr int WALL_DETECT_FRONT_TURN = 35;
 	robot.currentState = wro::State::DRIVING_STRAIGHT;
@@ -98,18 +116,10 @@ int main()
 	return 0;
 }
 
-bool finished(wro::Robot& robot)
-{
-	// TODO check whether robot is back in starting section
-	return false;
-}
-
 // when driving 
-int openingRoundMain()
+int openChallenge(wro::Robot& robot)
 {
 	constexpr int WALL_DETECT_FRONT_TURN = 35;
-
-	wro::Robot robot = wro::Robot();
 
 	wro::State currentState = wro::State::STARTING_STRAIGHT;
 	std::chrono::steady_clock::time_point state_start_time;
@@ -147,7 +157,7 @@ int openingRoundMain()
 			// Check if wall in front
 			if (currentDistances[front] != -1 && currentDistances[front] < WALL_DETECT_FRONT_TURN)
 			{
-				std::cout << "Front wall, checking side sensors..." << std::endl;
+				DEBUG_PRINTLN("Front wall, checking side sensors...");
 
 				// Read side sensors
 				int distanceLeft = currentDistances[left];
@@ -172,31 +182,31 @@ int openingRoundMain()
 					else
 					{
 						// Distances too similar
-						std::cout << "WARN: Side distances similar (" << distanceLeft << "L, " << distanceRight << "R)" << std::endl;
+						DEBUG_PRINTLN("WARN: Side distances similar (" << distanceLeft << "L, " << distanceRight << "R)");
 						isClockwise = false;
 					}
 				}
 				else if (rightValid)
 				{
 					// Only right sensor is valid -> Assume right is open -> Clockwise
-					std::cout << "INFO: Left sensor invalid (" << distanceLeft << "). Assuming Clockwise based on Right (" << distanceRight << ")." << std::endl;
+					DEBUG_PRINTLN("INFO: Left sensor invalid (" << distanceLeft << "). Assuming Clockwise based on Right (" << distanceRight << ").");
 					isClockwise = true;
 				}
 				else if (leftValid)
 				{
 					// Only left sensor is valid -> Assume left is open -> Counter-Clockwise
-					std::cout << "INFO: Right sensor invalid (" << distanceRight << "). Assuming Counter-Clockwise based on Left (" << distanceLeft << ")." << std::endl;
+					DEBUG_PRINTLN("INFO: Right sensor invalid (" << distanceRight << "). Assuming Counter-Clockwise based on Left (" << distanceLeft << ").");
 					isClockwise = false;
 				}
 				else
 				{
 					// Nothing is valid
-					std::cout << "WARN: Both side sensors invalid (" << distanceLeft << "L, " << distanceRight << "R)" << std::endl;
+					DEBUG_PRINTLN("WARN: Both side sensors invalid (" << distanceLeft << "L, " << distanceRight << "R)");
 					isClockwise = false;
 				}
 
 				directionDetermined = true;
-				std::cout << "Determined Direction: " << (isClockwise ? "Clockwise" : "Counter-Clockwise") << std::endl;
+				DEBUG_PRINTLN("Determined Direction: " << (isClockwise ? "Clockwise" : "Counter-Clockwise"));
 
 
 				currentState = wro::State::TURNING_CORNER;
@@ -219,16 +229,16 @@ int openingRoundMain()
 				auto turn_elapsed = std::chrono::duration_cast<std::chrono::duration<double>>(now - state_start_time);
 				if (turn_elapsed.count() > robot.TURN_DURATION_SEC)
 				{
-					std::cout << "Turn " << (turnsDone + 1) << " done" << std::endl;
+					DEBUG_PRINTLN("Turn " << (turnsDone + 1) << " done");
 					turnsDone++;
 					if (turnsDone >= 4)
 					{
 						lapsDone++;
 						turnsDone = 0;
-						std::cout << "--- Lap " << lapsDone << " done ---" << std::endl;
+						DEBUG_PRINTLN("--- Lap " << lapsDone << " done ---");
 						if (lapsDone >= 3)
 						{
-							std::cout << "3 Laps Done, Stopping" << std::endl;
+							DEBUG_PRINTLN("3 Laps Done, Stopping");
 							currentState = wro::State::STOPPED;
 							motorSpeed = 0;
 							steeringAngle = robot.SERVO_CENTER;
@@ -266,7 +276,7 @@ int openingRoundMain()
 			// Check for next turn 
 			if (currentDistances[front] != -1 && currentDistances[front] < WALL_DETECT_FRONT_TURN)
 			{
-				std::cout << "Wall detected, initiating turn " << (turnsDone + 1) << std::endl;
+				DEBUG_PRINTLN("Wall detected, initiating turn " << (turnsDone + 1));
 				currentState = wro::State::TURNING_CORNER;
 				state_start_time = std::chrono::steady_clock::now();
 				motorSpeed = robot.OPENING_RACE_TURN_SPEED;
