@@ -29,13 +29,16 @@ namespace wro
 		static constexpr double NO_DISTANCE = -1.0;
 
 	private:
-		static void measureDistance(PIN pin, std::chrono::high_resolution_clock::time_point tTrigger, double& distance);
+		static void measureDistance(PIN pTrigger, PIN pEcho, double& distance);
 
 		std::array<double, 4> distances = // in cm
 		{ NO_DISTANCE, NO_DISTANCE, NO_DISTANCE, NO_DISTANCE }; // index as in directions
 
 		static constexpr unsigned int V_SOUND = 34330; // cm/s
-		static constexpr PIN P_TRIGGER = 22;
+		static constexpr PIN P_TRIGGER_FRONT = 22;
+		static constexpr PIN P_TRIGGER_BACK = 19;
+		static constexpr PIN P_TRIGGER_LEFT = 26;
+		static constexpr PIN P_TRIGGER_RIGHT = 13;
 		static constexpr PIN P_FRONT = 23;
 		static constexpr PIN P_BACK = 24;
 		static constexpr PIN P_LEFT = 25;
