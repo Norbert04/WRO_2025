@@ -1,6 +1,5 @@
 #include "DistanceSensor.h"
 
-#include <mutex>
 #include <thread>
 #include <vector>
 #include <wiringPi.h>
@@ -33,8 +32,8 @@ std::array<double, 4> wro::DistanceSensor::update()
 	std::array<double, 4> distances;
 	std::vector<std::thread> threads;
 	threads.emplace_back(measureDistance, P_TRIGGER_FRONT, P_FRONT, std::ref(distances[0]));
-	threads.emplace_back(measureDistance, P_TRIGGER_BACK, P_BACK, std::ref(distances[1]));
-	threads.emplace_back(measureDistance, P_TRIGGER_LEFT, P_LEFT, std::ref(distances[2]));
+	threads.emplace_back(measureDistance, P_TRIGGER_LEFT, P_LEFT, std::ref(distances[1]));
+	threads.emplace_back(measureDistance, P_TRIGGER_BACK, P_BACK, std::ref(distances[2]));
 	threads.emplace_back(measureDistance, P_TRIGGER_RIGHT, P_RIGHT, std::ref(distances[3]));
 
 	measureDistance(P_TRIGGER_FRONT, P_FRONT, std::ref(distances[0]));
@@ -51,7 +50,7 @@ std::array<double, 4> wro::DistanceSensor::getLastValues() const
 {
 	return distances;
 }
-std::mutex m;
+
 void wro::DistanceSensor::measureDistance(PIN pTrigger, PIN pEcho, double& distance)
 {
 	digitalWrite(pTrigger, HIGH);
@@ -68,14 +67,13 @@ void wro::DistanceSensor::measureDistance(PIN pTrigger, PIN pEcho, double& dista
 		distance = NO_DISTANCE;
 		return;
 	}
+
 	auto end = std::chrono::high_resolution_clock::now();
 	while (digitalRead(pEcho) == HIGH &&
 		(std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(15))
 		end = std::chrono::high_resolution_clock::now();
+
 	const std::chrono::duration<double> t = end - start;
-	m.lock();
-	DEBUG_PRINTLN(t);
-	m.unlock();
 	distance = (t.count() * V_SOUND) / 2; //distance has to be travelled twice, time in nanoseconds
 	if (distance > 400) // object is more than 4m away
 		distance = NO_DISTANCE;

@@ -112,7 +112,7 @@ int obstacleChallenge(wro::Robot& robot)
 
 		robot.run();
 	}
-
+	robot.stopMovement();
 	return 0;
 }
 
@@ -294,10 +294,10 @@ int openChallenge(wro::Robot& robot)
 
 		}
 		int angle = std::max(robot.SERVO_MAX_LEFT, std::min(robot.SERVO_MAX_RIGHT, steeringAngle));
-		robot.drive(motorSpeed);
+		robot.setSpeed(motorSpeed);
 		robot.setSteeringAngle(angle);
 	}
-
+	robot.stopMovement();
 	return 0;
 }
 

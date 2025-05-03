@@ -38,7 +38,7 @@ void wro::Robot::stopMovement()
 
 void wro::Robot::steer(short angle)
 {
-	assert(angle >= 40 && angle <= 130);
+	assert(angle >= SERVO_MAX_LEFT && angle <= SERVO_MAX_RIGHT);
 	wro::Connection::Get()->steer(angle);
 	updatePosition();
 	steeringAngle = angle;

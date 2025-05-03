@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <chrono>
 
 typedef unsigned char BYTE;
 typedef BYTE PIN;

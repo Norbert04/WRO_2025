@@ -84,14 +84,14 @@ namespace wro
 
 		// For wall following
 		static constexpr double WALL_FOLLOW_KP = 1.8;          // Proportional gain for wall following
- 		static constexpr double WALL_FOLLOW_KD = 1.0;   
+		static constexpr double WALL_FOLLOW_KD = 1.0;
 		static constexpr int TARGET_OUTER_WALL_DISTANCE = 15;  // Target distance (cm) from the OUTER wall
 
 		static constexpr double TURN_DURATION_SEC = 2.0;
 
 		static constexpr int SERVO_CENTER = 90;
-		static constexpr int SERVO_MAX_LEFT = 45;
-		static constexpr int SERVO_MAX_RIGHT = 135;
+		static constexpr int SERVO_MAX_LEFT = 55;
+		static constexpr int SERVO_MAX_RIGHT = 125;
 
 	private:
 		void updatePosition(); // should be called before changing angle or speed
