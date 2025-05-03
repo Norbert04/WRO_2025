@@ -18,4 +18,5 @@ void loop()
       if(Serial.available() != 0) {
         wro::Connection::Get()->handleEvent();
       }
+      wro::movement::run();
 }

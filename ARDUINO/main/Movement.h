@@ -17,7 +17,9 @@ namespace wro
 		void stop();
 		void steer(int angle); // angle of wheels in degree, 90deg is normal
 		BYTE getAngle();
+		void run();
 
+		constexpr unsigned long ACCELERATION_TIME = 500000; // us; time to reach destined speed/angle
 		constexpr PIN P_DRV_FORWARD = 12;
 		constexpr PIN P_DRV_BACKWARD = 13;
 		constexpr PIN P_DRV_SPEED = 3;
