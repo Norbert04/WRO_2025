@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <chrono>
 
 typedef unsigned char BYTE;
 typedef BYTE PIN;
@@ -25,6 +26,8 @@ namespace wro
 		std::array<double, 4> update();
 		std::array<double, 4> getLastValues() const;
 
+		bool allDistancesValid();
+
 		static constexpr double NO_DISTANCE = -1.0;
 
 	private:
@@ -32,6 +35,8 @@ namespace wro
 
 		std::array<double, 4> distances = // in cm
 		{ NO_DISTANCE, NO_DISTANCE, NO_DISTANCE, NO_DISTANCE }; // index as in directions
+
+		std::chrono::steady_clock::time_point lastUpdate = std::chrono::steady_clock::now();
 
 		static constexpr unsigned int V_SOUND = 34330; // cm/s
 		static constexpr PIN P_TRIGGER_FRONT = 22;

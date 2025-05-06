@@ -66,13 +66,14 @@ namespace wro
 		short getCameraSteeringAngle();
 
 		std::optional<bool> drivingDirection(); // true -> clockwise; false -> counter clockwise
+		void setDirection(bool direction);
 
 		Point<unsigned int> estimatePosition(); // in mm starting in top-left edge
 		double estimateAngle(); // in rad
 
 		State currentState = State::IDLE;
 
-		std::chrono::high_resolution_clock::time_point turnStartTime; // TODO find a better solution for this
+		std::chrono::steady_clock::time_point turnStartTime; // TODO find a better solution for this
 
 		// TODO move/ structure constants
 		// Driving Control Parameters
@@ -106,10 +107,13 @@ namespace wro
 		static constexpr short maxRPM = 326 * 0.5; // motorRPM * gearRatio
 
 		Point<unsigned int> position = { 0,0 }; // in mm starting in top-left edge
+		BYTE currentSection = 0; // counter clockwise (0->starting section); 8 -> either 1 or 7 (direction not determined yet); 9 -> unknown
+		bool inCornerSection = false;
 		double angle = 0; // rad
 		bool checkedDirection = false; // if direction is counter clockwise the starting angle must be 180 degrees
+		bool direction = false; // true -> clockwise; false -> counter clockwise
 
-		std::chrono::time_point<std::chrono::high_resolution_clock> lastPositionUpdate;
+		std::chrono::time_point<std::chrono::steady_clock> lastPositionUpdate;
 
 		short steeringAngle = 90; // deg
 		float speed = 0; // -1 - 1 as passed to drive function

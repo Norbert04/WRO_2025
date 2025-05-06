@@ -300,7 +300,7 @@ short wro::Camera::getSteeringAngle()
 		{
 			auto turn_elapsed =
 				std::chrono::duration_cast<std::chrono::duration<double>>(
-					std::chrono::high_resolution_clock::now() - robot->turnStartTime);
+					std::chrono::steady_clock::now() - robot->turnStartTime);
 			if (turn_elapsed.count() > wro::Robot::TURN_DURATION_SEC)
 			{
 				DEBUG_PRINTLN("Turn complete");

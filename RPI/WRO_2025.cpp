@@ -12,7 +12,8 @@
 bool finished(wro::Robot& robot);
 int obstacleChallenge(wro::Robot& robot);
 int openChallenge(wro::Robot& robot);
-double calculateOuterWallAdjustment(const std::array<double, 4> currentDistances, bool clockwise, int targetDistance, int& lastError, double kp, double kd);
+double calculateOuterWallAdjustment(const std::array<double, 4> currentDistances,
+	bool clockwise, int targetDistance, int& lastError, double kp, double kd);
 
 int main()
 {
@@ -68,7 +69,7 @@ int obstacleChallenge(wro::Robot& robot)
 		{
 			DEBUG_PRINTLN("Wall detected on front, turn left now");
 			robot.currentState = wro::State::TURNING_LEFT;
-			robot.turnStartTime = std::chrono::high_resolution_clock::now();
+			robot.turnStartTime = std::chrono::steady_clock::now();
 			robot.setSpeed(wro::Robot::TURN_SPEED);
 			robot.setSteeringAngle(wro::Robot::SERVO_MAX_LEFT);
 		}
@@ -143,7 +144,7 @@ int openChallenge(wro::Robot& robot)
 		using namespace wro::directions;
 		std::array<double, 4> currentDistances = robot.updateDistances();
 
-		int motorSpeed = 0;
+		float motorSpeed = 0;
 		int steeringAngle = robot.SERVO_CENTER;
 		std::string currentStateString = "UNKNOWN";
 
@@ -302,7 +303,8 @@ int openChallenge(wro::Robot& robot)
 }
 
 // Wall Following Calculation 
-double calculateOuterWallAdjustment(const std::array<double, 4> currentDistances, bool clockwise, int targetDistance, int& lastError, double kp, double kd)
+double calculateOuterWallAdjustment(const std::array<double, 4> currentDistances,
+	bool clockwise, int targetDistance, int& lastError, double kp, double kd)
 {
 	using namespace wro::directions;
 	int currentDistance = clockwise ? currentDistances[right] : currentDistances[left];

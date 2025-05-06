@@ -1,5 +1,6 @@
 #include "Robot.h"
 
+#include <array>
 #include <cassert>
 #include <chrono>
 #include <cmath>
@@ -7,6 +8,7 @@
 #include <optional>
 
 #include "Connection.h"
+#include "utils.h"
 
 wro::Robot::Robot()
 	:camera(this), distanceSensor()
@@ -78,14 +80,19 @@ short wro::Robot::getCameraSteeringAngle()
 
 std::optional<bool> wro::Robot::drivingDirection()
 {
-	std::optional<bool> direction = std::nullopt;
 	// TODO modify checkedDirection accordingly
-	if (direction)
+	if (checkedDirection)
 	{
-		return direction.value();
+		return direction;
 	}
 	// TODO check distance sensor
 	return std::nullopt;
+}
+
+void wro::Robot::setDirection(bool direction)
+{
+	checkedDirection = true;
+	this->direction = direction;
 }
 
 wro::Point<unsigned int> wro::Robot::estimatePosition()
@@ -102,11 +109,10 @@ double wro::Robot::estimateAngle()
 
 void wro::Robot::updatePosition()
 {
-	// TODO include distance sensor results in estimation
-	auto time = std::chrono::high_resolution_clock::now();
+	auto time = std::chrono::steady_clock::now();
 	std::chrono::duration<double> deltaTime = time - lastPositionUpdate;
 	unsigned int currentSpeed = speed * maxRPM * wheelDiameter * std::numbers::pi / 6; // mm/s
-	if (steeringAngle = 90)
+	if (steeringAngle == SERVO_CENTER)
 	{
 		position.x += std::cos(angle) * currentSpeed * deltaTime.count();
 		position.y += std::sin(angle) * currentSpeed * deltaTime.count();
@@ -120,6 +126,19 @@ void wro::Robot::updatePosition()
 		position.x += std::cos(angle) * std::sin(deltaAngle) * curveRadius;
 		position.y += std::sin(angle) * std::cos(deltaAngle) * curveRadius;
 		angle += deltaAngle;
+		// keep angle in range -pi to pi
+		if (angle > std::numbers::pi)
+			angle -= 2 * std::numbers::pi;
+		if (angle < -std::numbers::pi)
+			angle += 2 * std::numbers::pi;
+	}
+	if (!inCornerSection && abs(fmod(angle, std::numbers::pi / 2)) <= std::numbers::pi / 18)
+	{ // robot is approximately parallel to side walls (+-10deg)
+		std::array<double, 4> distances = updateDistances();
+		if (distanceSensor.allDistancesValid())
+		{
+			// TODO correct position with distance sensors
+		}
 	}
 	lastPositionUpdate = time;
 }
